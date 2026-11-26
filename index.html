@@ -4,6 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>数智植物工厂 · 固定＋移动协同巡检</title>
+<link rel="icon" href="data:," />
 <style>
   :root{
     --bg:#05080f;
@@ -95,12 +96,14 @@
            border-left:2px solid var(--ok);padding:6px 0 6px 9px;background:rgba(53,185,138,0.06);}
 
   /* 底部 */
-  #hud-bottom{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);display:flex;gap:6px;padding:8px 10px;background:rgba(7,12,22,0.8);border:1px solid var(--line);}
+  #hud-bottom{position:fixed;left:0;right:0;bottom:0;display:flex;flex-direction:column;align-items:center;gap:8px;
+              padding:12px 16px 14px;background:linear-gradient(to top,rgba(5,8,15,0.94),rgba(5,8,15,0));z-index:22;}
+  #hud-bottom .row{display:flex;gap:6px;padding:8px 10px;background:rgba(7,12,22,0.8);border:1px solid var(--line);}
   .btn{padding:6px 14px;font-size:11px;color:#9fc0dc;border:1px solid rgba(70,120,180,0.35);cursor:pointer;letter-spacing:.5px;}
   .btn:hover{color:var(--cyan);border-color:var(--cyan);}
   .btn.primary{color:var(--cyan);border-color:var(--cyan);background:rgba(63,182,232,0.1);}
 
-  #note{position:fixed;left:20px;bottom:16px;font-size:9.5px;color:#4f6479;line-height:1.6;z-index:20;max-width:300px;}
+  #note{font-size:9.5px;color:#4f6479;line-height:1.6;text-align:center;max-width:min(720px,86vw);}
   #labels{position:fixed;inset:0;pointer-events:none;z-index:15;}
   .lab{position:absolute;font-size:9.5px;color:#83a9c9;letter-spacing:1px;transform:translate(-50%,-100%);white-space:nowrap;}
   .lab.alarm{color:var(--warn);}
@@ -108,6 +111,29 @@
   #boot{position:fixed;inset:0;background:#05080f;z-index:50;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;transition:opacity .5s;}
   #boot .b1{font-size:13px;letter-spacing:4px;color:var(--cyan);}
   #boot .b2{font-size:10px;color:var(--dim);letter-spacing:1px;}
+
+  /* 窄屏适配：投屏或小窗口时不挤压、不叠字 */
+  @media (max-width:1200px){
+    .stat{min-width:74px;padding:2px 8px;}
+    .hint{display:none;}
+  }
+  @media (max-width:900px){
+    #hud-left{width:190px;left:10px;}
+    #hud-right{width:250px;right:10px;}
+    #hud-top{gap:10px;padding:0 12px;}
+    #hud-top .brand p{display:none;}
+    .stat{min-width:62px;padding:2px 6px;}
+    .stat .k{font-size:8.5px;letter-spacing:0;}
+    .stat .v{font-size:12px;}
+  }
+  @media (max-height:720px){
+    #hud-left,#hud-right{top:70px;}
+    #hud-right{max-height:calc(100vh - 150px);overflow-y:auto;}
+    #hud-right::-webkit-scrollbar{width:4px;}
+    #hud-right::-webkit-scrollbar-thumb{background:rgba(70,120,180,0.5);}
+    #hud-right::-webkit-scrollbar-track{background:transparent;}
+    #hud-right{scrollbar-width:thin;scrollbar-color:rgba(70,120,180,0.5) transparent;}
+  }
 </style>
 </head>
 <body>
@@ -170,14 +196,16 @@
 </aside>
 
 <div id="hud-bottom">
-  <div class="btn primary" id="btn-start">开始巡检</div>
-  <div class="btn" id="btn-step">单步</div>
-  <div class="btn" id="btn-reset">复位</div>
-  <div class="btn" id="btn-view">视角复位</div>
-  <div class="btn" id="btn-light">昼 / 夜</div>
+  <div id="note">演示用原型：场景与数值为模拟，用于呈现任务流转与人机边界；真实点位、阈值以实训室平台为准。</div>
+  <div class="row">
+    <div class="btn primary" id="btn-start">开始巡检</div>
+    <div class="btn" id="btn-step">单步</div>
+    <div class="btn" id="btn-reset">复位</div>
+    <div class="btn" id="btn-view">视角复位</div>
+    <div class="btn" id="btn-light">昼 / 夜</div>
+  </div>
 </div>
 
-<div id="note">演示用原型：场景与数值为模拟，用于呈现任务流转与人机边界；真实点位、阈值以实训室平台为准。</div>
 <div id="flash"></div>
 <div id="boot"><div class="b1">正在载入场景</div><div class="b2">固定监测 ＋ 移动复核</div></div>
 
@@ -53838,10 +53866,14 @@ function jitterSensors(t) {
 
 function loop() {
   requestAnimationFrame(loop);
-  const dt = Math.min(clock.getDelta(), 0.12);
+  // 固定步长推进：帧率高低下动画速度一致，投屏时不至于慢放
+  let elapsed = clock.getDelta();
+  if (elapsed > 1.0) elapsed = 1.0;
+  const steps = Math.max(1, Math.min(20, Math.ceil(elapsed / 0.05)));
+  const dt = elapsed / steps;
   const t = clock.elapsedTime;
 
-  updateAgv(dt);
+  for (let i = 0; i < steps; i++) updateAgv(dt);
   pulseAlarm(t);
   updateLabels();
   jitterSensors(t);
