@@ -105,12 +105,47 @@
 
   #note{font-size:9.5px;color:#4f6479;line-height:1.6;text-align:center;max-width:min(720px,86vw);}
   #labels{position:fixed;inset:0;pointer-events:none;z-index:15;}
-  .lab{position:absolute;font-size:9.5px;color:#83a9c9;letter-spacing:1px;transform:translate(-50%,-100%);white-space:nowrap;}
+  .lab{position:absolute;font-size:9.5px;color:#8fb6d6;letter-spacing:1px;transform:translate(-50%,-100%);white-space:nowrap;padding:1px 6px;border-radius:8px;background:rgba(6,14,24,.6);border:1px solid rgba(90,160,220,.22);}
   .lab.alarm{color:var(--warn);}
   #flash{position:fixed;inset:0;background:#fff;opacity:0;pointer-events:none;z-index:40;transition:opacity .12s;}
   #boot{position:fixed;inset:0;background:#05080f;z-index:50;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;transition:opacity .5s;}
   #boot .b1{font-size:13px;letter-spacing:4px;color:var(--cyan);}
   #boot .b2{font-size:10px;color:var(--dim);letter-spacing:1px;}
+
+  /* 点位网格（随行列配置生成） */
+  #pt-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px 4px;margin-bottom:2px;}
+  #pt-grid .cell{display:flex;align-items:center;gap:4px;font-size:9px;color:var(--dim);letter-spacing:.4px;}
+  #pt-grid .cell i{width:5px;height:5px;background:var(--ok);flex:0 0 auto;}
+  #pt-grid .cell.alarm{color:var(--warn);}
+  #pt-grid .cell.alarm i{background:var(--warn);box-shadow:0 0 6px var(--warn);}
+
+  /* 编辑面板 */
+  #edit-modal{position:fixed;inset:0;z-index:60;display:none;align-items:center;justify-content:center;background:rgba(4,7,13,0.74);}
+  #edit-modal.on{display:flex;}
+  #edit-card{width:min(540px,92vw);max-height:88vh;overflow-y:auto;background:#0a1322;border:1px solid var(--line);padding:16px 20px 18px;box-shadow:0 18px 60px rgba(0,0,0,.6);}
+  #edit-card::-webkit-scrollbar{width:4px;}
+  #edit-card::-webkit-scrollbar-thumb{background:rgba(70,120,180,0.5);}
+  .em-title{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:#e6f4ff;letter-spacing:2px;padding-bottom:10px;border-bottom:1px solid var(--line);}
+  .em-title span{font-size:10px;color:var(--dim);letter-spacing:1px;cursor:pointer;}
+  .em-title span:hover{color:var(--cyan);}
+  .em-sec{font-size:10px;letter-spacing:2px;color:var(--dim);margin:14px 0 8px;}
+  .em-sec small{font-size:9px;letter-spacing:0;color:#43596f;margin-left:8px;}
+  .em-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+  .em-row label{font-size:10.5px;color:#8fadc8;min-width:84px;}
+  .em-row select{background:#0d1a2b;color:#cfe0f2;border:1px solid rgba(70,120,180,0.4);font-size:11px;padding:4px 8px;font-family:inherit;outline:none;}
+  .em-chips{display:flex;flex-wrap:wrap;gap:6px;}
+  .chip{font-size:10.5px;color:#8fadc8;border:1px solid rgba(70,120,180,0.35);padding:5px 10px;cursor:pointer;letter-spacing:.5px;}
+  .chip:hover{color:var(--cyan);border-color:var(--cyan);}
+  .chip.on{color:var(--cyan);border-color:var(--cyan);background:rgba(63,182,232,0.1);}
+  .chip.place{color:#e4c07a;border-color:rgba(228,192,122,0.45);}
+  #em-prop-list{margin-top:8px;font-size:10px;color:#7f97b0;line-height:1.9;}
+  #em-prop-list .pl{display:flex;justify-content:space-between;gap:8px;}
+  #em-prop-list .pl b{color:#b9cde0;font-weight:400;}
+  #em-prop-list .pl span{color:var(--dim);cursor:pointer;}
+  #em-prop-list .pl span:hover{color:var(--warn);}
+  .em-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:18px;padding-top:12px;border-top:1px solid var(--line);}
+
+  #place-hint{position:fixed;left:50%;transform:translateX(-50%);bottom:106px;z-index:35;display:none;font-size:10.5px;color:#e4c07a;background:rgba(9,14,26,0.92);border:1px solid rgba(228,192,122,0.4);padding:7px 14px;}
 
   /* 窄屏适配：投屏或小窗口时不挤压、不叠字 */
   @media (max-width:1200px){
@@ -160,13 +195,11 @@
 </header>
 
 <aside id="hud-left" class="panel">
-  <div class="sec-t">固定监测点位</div>
-  <div class="pt" id="pt-0"><span class="n"><i class="dot"></i>1 号架位 · 多层水培</span><span class="s">正常</span></div>
-  <div class="pt" id="pt-1"><span class="n"><i class="dot"></i>2 号架位 · 多层水培</span><span class="s">正常</span></div>
-  <div class="pt" id="pt-2"><span class="n"><i class="dot"></i>3 号架位 · 多层水培</span><span class="s">正常</span></div>
+  <div class="sec-t">固定监测点位 <span id="pt-count"></span></div>
+  <div id="pt-grid"></div>
   <div id="alert-box">
     <div class="a-t">阈值告警</div>
-    <div class="a-v">2 号架位 · 第 3 层<br/>EC 1.42 低于下限 1.6</div>
+    <div class="a-v" id="alert-text">2 行 3 列 · 第 3 层<br/>EC 1.42 低于下限 1.6</div>
   </div>
 </aside>
 
@@ -184,7 +217,7 @@
   <div class="mtitle" id="task-t" style="display:none">当前任务</div>
   <div class="box" id="task-box" style="display:none">
     <div class="kv"><span class="k">任务编号</span><span class="v">M-1127-02</span></div>
-    <div class="kv"><span class="k">目标点位</span><span class="v">2 号架位 · 第 3 层</span></div>
+    <div class="kv"><span class="k">目标点位</span><span class="v" id="task-pt">2 行 3 列 · 第 3 层</span></div>
     <div class="kv"><span class="k">执行动作</span><span class="v">近距拍照 ＋ 复核</span></div>
   </div>
 
@@ -203,8 +236,43 @@
     <div class="btn" id="btn-reset">复位</div>
     <div class="btn" id="btn-view">视角复位</div>
     <div class="btn" id="btn-light">昼 / 夜</div>
+    <div class="btn" id="btn-edit">编辑场景</div>
   </div>
 </div>
+
+<div id="edit-modal">
+  <div id="edit-card">
+    <div class="em-title">场景与配件设置<span id="em-x">关闭</span></div>
+
+    <div class="em-sec">架体阵列</div>
+    <div class="em-row"><label>行数</label><select id="em-rows"></select><label>列数</label><select id="em-cols"></select></div>
+    <div class="em-row"><label>层数</label><select id="em-layers"></select><label>每层株数</label><select id="em-plants"></select></div>
+
+    <div class="em-sec">配件模块</div>
+    <div class="em-row"><label>每架位传感节点</label><select id="em-sensors"></select></div>
+    <div class="em-chips">
+      <div class="chip" data-flag="ledOn">LED 补光灯带</div>
+      <div class="chip" data-flag="agvCam">车载摄像头</div>
+      <div class="chip" data-flag="cabOn">控制柜</div>
+      <div class="chip" data-flag="fertOn">水肥一体机</div>
+    </div>
+
+    <div class="em-sec">自由摆放配件<small>选中后点「放置」，再点地面落位</small></div>
+    <div class="em-chips" id="em-prop-types"></div>
+    <div id="em-prop-list"></div>
+
+    <div class="em-sec">告警点位</div>
+    <div class="em-row"><label>行</label><select id="em-arow"></select><label>列</label><select id="em-acol"></select></div>
+
+    <div class="em-actions">
+      <div class="btn" id="em-reset">恢复默认</div>
+      <div class="btn" id="em-cancel">取消</div>
+      <div class="btn primary" id="em-apply">应用重建</div>
+    </div>
+  </div>
+</div>
+
+<div id="place-hint">点击地面放置：<span id="place-name"></span>　按 Esc 取消</div>
 
 <div id="flash"></div>
 <div id="boot"><div class="b1">正在载入场景</div><div class="b2">固定监测 ＋ 移动复核</div></div>
@@ -53355,8 +53423,8 @@ scene.background = new THREE.Color(0x05080f);
 scene.fog = new THREE.FogExp2(0x05080f, 0.016);
 
 const camera = new THREE.PerspectiveCamera(45, W() / H(), 0.1, 200);
-const CAM_HOME = new THREE.Vector3(0, 6.2, 19.5);
-const CAM_TARGET = new THREE.Vector3(0, 3.1, 0.6);
+let CAM_HOME = new THREE.Vector3(0, 6.2, 19.5);
+let CAM_TARGET = new THREE.Vector3(0, 3.1, 0.6);
 camera.position.copy(CAM_HOME);
 
 const controls = new OrbitLite(camera, renderer.domElement, CAM_TARGET);
@@ -53391,135 +53459,155 @@ const M = {
 };
 const ledMat = new THREE.MeshStandardMaterial({color: 0xdfefff, emissive: 0x9fd8ff, emissiveIntensity: 1.15, roughness: 0.4});
 
-/* 地面 */
-const floor = new THREE.Mesh(new THREE.BoxGeometry(46, 0.3, 26), M.floor);
+/* 地面与厂房外壳：按最大配置一次铺底（行列入模后只重建架体，不动外壳） */
+const FLOOR_W = 58, FLOOR_D = 36, WALL_Z = -14.5;
+const floor = new THREE.Mesh(new THREE.BoxGeometry(FLOOR_W, 0.3, FLOOR_D), M.floor);
 floor.position.y = -0.15;
 scene.add(floor);
 
-const grid = new THREE.GridHelper(46, 46, 0x1c3350, 0x122436);
+const grid = new THREE.GridHelper(FLOOR_W, FLOOR_W, 0x1c3350, 0x122436);
 grid.position.y = 0.005;
 grid.material.opacity = 0.55;
 grid.material.transparent = true;
 scene.add(grid);
 
-/* 走道 */
-const aisle = new THREE.Mesh(new THREE.BoxGeometry(44, 0.02, 1.2), new THREE.MeshBasicMaterial({color: 0x10283d}));
-aisle.position.set(0, 0.011, 3.6);
-scene.add(aisle);
-
 /* 后墙 */
-const wall = new THREE.Mesh(new THREE.BoxGeometry(46, 6.2, 0.2), new THREE.MeshStandardMaterial({color: 0x101d2c, metalness: 0.2, roughness: 0.85}));
-wall.position.set(0, 3.1, -6.2);
+const wall = new THREE.Mesh(new THREE.BoxGeometry(FLOOR_W, 6.2, 0.2), new THREE.MeshStandardMaterial({color: 0x101d2c, metalness: 0.2, roughness: 0.85}));
+wall.position.set(0, 3.1, WALL_Z);
 scene.add(wall);
 
-[0.35].forEach(y => {
-  const strip = new THREE.Mesh(new THREE.BoxGeometry(44, 0.05, 0.02), new THREE.MeshBasicMaterial({color: 0x1d4c74}));
-  strip.position.set(0, y, -6.05);
-  scene.add(strip);
-});
+const wallStrip = new THREE.Mesh(new THREE.BoxGeometry(FLOOR_W - 4, 0.05, 0.02), new THREE.MeshBasicMaterial({color: 0x1d4c74}));
+wallStrip.position.set(0, 0.35, WALL_Z + 0.15);
+scene.add(wallStrip);
 
 /* 玻璃隔断竖梃：给背景一层纵向结构 */
 const mullionMat = new THREE.MeshStandardMaterial({color: 0x24384b, metalness: 0.2, roughness: 0.7});
-for (let x = -22; x <= 22; x += 2) {
+for (let x = -FLOOR_W / 2 + 2; x <= FLOOR_W / 2 - 2; x += 2) {
   const m = new THREE.Mesh(new THREE.BoxGeometry(0.055, 6.0, 0.055), mullionMat);
-  m.position.set(x, 3.0, -6.02);
+  m.position.set(x, 3.0, WALL_Z + 0.18);
   scene.add(m);
 }
-const beamTop = new THREE.Mesh(new THREE.BoxGeometry(44, 0.08, 0.08), mullionMat);
-beamTop.position.set(0, 5.96, -6.02);
+const beamTop = new THREE.Mesh(new THREE.BoxGeometry(FLOOR_W - 4, 0.08, 0.08), mullionMat);
+beamTop.position.set(0, 5.96, WALL_Z + 0.18);
 scene.add(beamTop);
 
-const wallStripMat = null;
+/* 吊顶：架位铺到 5 列后视点要抬高，整块吊顶会挡镜头，这里只留两侧的边梁做背景暗示 */
+const ceilEdgeMat = new THREE.MeshStandardMaterial({color: 0x101c2b, metalness: 0.1, roughness: 0.9});
+[-1, 1].forEach(s => {
+  const beam = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.12, FLOOR_D), ceilEdgeMat);
+  beam.position.set(s * (FLOOR_W / 2 - 0.25), 6.3, 0);
+  scene.add(beam);
+});
+const ceilBack = new THREE.Mesh(new THREE.BoxGeometry(FLOOR_W, 0.12, 1.6), ceilEdgeMat);
+ceilBack.position.set(0, 6.3, WALL_Z + 1.0);
+scene.add(ceilBack);
 
-/* 吊顶与灯板 */
-const ceil = new THREE.Mesh(new THREE.BoxGeometry(46, 0.12, 26),
-  new THREE.MeshStandardMaterial({color: 0x101c2b, metalness: 0.1, roughness: 0.9}));
-ceil.position.set(0, 6.3, 0);
-scene.add(ceil);
+/* ================= 参数化场景模型 ================= */
+const RACK_W = 6.4, RACK_D = 1.7, LAYER_GAP = 1.05, BASE_Y = 1.0, GAP_X = 1.5, GAP_Z = 2.9;
 
-const panelMat = null;
+const DEFAULT_CFG = {
+  rows: 3, cols: 5, layers: 4, plants: 16,
+  sensorPerRack: 2, ledOn: true, agvCam: true, cabOn: true, fertOn: true,
+  alertRow: 0, alertCol: 2,
+  props: [],
+};
+const CFG = Object.assign({}, DEFAULT_CFG, {props: []});
+let SHELF_Y = [];
+let RACK_H = 4.8;
 
-/* 架位 */
-const RACK_X = [-9, 0, 9];
-const SHELF_Y = [1.0, 2.0, 3.0, 4.0];
-const RACKS = [];
+/* 动态组：架体阵列 / 叶菜 / 走道 / 路径线 / 标签，随参数重建 */
+const DYN = new THREE.Group();
+scene.add(DYN);
+const PROP_GROUP = new THREE.Group();     // 自由摆放的配件
+scene.add(PROP_GROUP);
 
-function buildRack(x, idx) {
+let leaves = null;
+let labEls = [];
+let alarmLabEl = null;
+let WP = [];
+let navT = 0;
+const AGV_START = new THREE.Vector3(-11.5, 0, 3.6);
+
+/* 单座架体：立柱 + 托盘 + 灯带 */
+function makeRack(layerYs, rackH) {
   const g = new THREE.Group();
-  const W_ = 6.0, D_ = 1.6, H_ = 4.65;
-  const postGeo = new THREE.BoxGeometry(0.09, H_, 0.09);
-  [[-W_/2 + 0.06, -D_/2], [W_/2 - 0.06, -D_/2], [-W_/2 + 0.06, D_/2], [W_/2 - 0.06, D_/2]].forEach(([px, pz]) => {
+  const postGeo = new THREE.BoxGeometry(0.09, rackH, 0.09);
+  [[-RACK_W/2 + 0.06, -RACK_D/2], [RACK_W/2 - 0.06, -RACK_D/2],
+   [-RACK_W/2 + 0.06, RACK_D/2], [RACK_W/2 - 0.06, RACK_D/2]].forEach(([px, pz]) => {
     const p = new THREE.Mesh(postGeo, M.frame);
-    p.position.set(px, H_/2, pz);
+    p.position.set(px, rackH/2, pz);
     g.add(p);
   });
 
-  SHELF_Y.forEach(y => {
-    const tray = new THREE.Mesh(new THREE.BoxGeometry(W_, 0.09, D_ * 0.82), M.tray);
+  layerYs.forEach(y => {
+    const tray = new THREE.Mesh(new THREE.BoxGeometry(RACK_W, 0.09, RACK_D * 0.82), M.tray);
     tray.position.set(0, y, 0);
     g.add(tray);
 
-    const led = new THREE.Mesh(new THREE.BoxGeometry(W_ * 0.94, 0.05, 0.3), ledMat);
-    led.position.set(0, y + 0.62, -0.15);
-    g.add(led);
+    if (CFG.ledOn) {
+      const led = new THREE.Mesh(new THREE.BoxGeometry(RACK_W * 0.94, 0.05, 0.3), ledMat);
+      led.position.set(0, y + 0.62, -0.15);
+      g.add(led);
+    }
   });
 
-  g.position.set(x, 0, 0);
-  scene.add(g);
   return g;
 }
 
-RACK_X.forEach((x, i) => RACKS.push(buildRack(x, i)));
+/* 叶菜（实例化，每次重建） */
+function makeLeaves(rackPos, layerYs, perLine) {
+  const lines = [-0.45, 0, 0.45];
+  const total = rackPos.length * layerYs.length * lines.length * perLine;
+  const leafGeo = new THREE.SphereGeometry(0.115, 7, 5);
+  leafGeo.scale(1, 0.55, 1);
+  const leafMat = new THREE.MeshStandardMaterial({roughness: 0.88, metalness: 0.05});
+  const mesh = new THREE.InstancedMesh(leafGeo, leafMat, total);
+  mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
 
-/* 叶菜（实例化） */
-const rows = [-0.42, 0, 0.42];
-const cols = 20;
-const perShelf = rows.length * cols;
-const total = RACK_X.length * SHELF_Y.length * perShelf;
-
-const leafGeo = new THREE.SphereGeometry(0.115, 7, 5);
-leafGeo.scale(1, 0.55, 1);
-const leafMat = new THREE.MeshStandardMaterial({roughness: 0.88, metalness: 0.05});
-const leaves = new THREE.InstancedMesh(leafGeo, leafMat, total);
-leaves.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
-
-const dummy = new THREE.Object3D();
-const tmpColor = new THREE.Color();
-let ii = 0;
-RACK_X.forEach((rx) => {
-  SHELF_Y.forEach((y) => {
-    rows.forEach((rz) => {
-      for (let c = 0; c < cols; c++) {
-        const px = rx - 2.35 + c * (4.7 / (cols - 1));
-        dummy.position.set(px, y + 0.13, rz);
-        const s = 0.85 + Math.random() * 0.45;
-        dummy.scale.set(s, s, s);
-        dummy.rotation.y = Math.random() * Math.PI;
-        dummy.updateMatrix();
-        leaves.setMatrixAt(ii, dummy.matrix);
-        tmpColor.setHSL(0.30 + Math.random() * 0.05, 0.42, 0.26 + Math.random() * 0.14);
-        leaves.setColorAt(ii, tmpColor);
-        ii++;
-      }
+  const dummy = new THREE.Object3D();
+  const tmpColor = new THREE.Color();
+  let ii = 0;
+  rackPos.forEach(({x, z}) => {
+    layerYs.forEach((y) => {
+      lines.forEach((dz) => {
+        for (let c = 0; c < perLine; c++) {
+          const px = x - RACK_W * 0.46 + c * (RACK_W * 0.92 / Math.max(1, perLine - 1));
+          dummy.position.set(px, y + 0.13, z + dz * (RACK_D / 1.7));
+          const s = 0.85 + Math.random() * 0.45;
+          dummy.scale.set(s, s, s);
+          dummy.rotation.y = Math.random() * Math.PI;
+          dummy.updateMatrix();
+          mesh.setMatrixAt(ii, dummy.matrix);
+          tmpColor.setHSL(0.30 + Math.random() * 0.05, 0.42, 0.26 + Math.random() * 0.14);
+          mesh.setColorAt(ii, tmpColor);
+          ii++;
+        }
+      });
     });
   });
-});
-leaves.instanceMatrix.needsUpdate = true;
-if (leaves.instanceColor) leaves.instanceColor.needsUpdate = true;
-scene.add(leaves);
+  mesh.instanceMatrix.needsUpdate = true;
+  if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
+  return mesh;
+}
 
-/* 传感节点 */
-const sensorGeo = new THREE.SphereGeometry(0.055, 8, 6);
+/* 传感节点（每个架位按配置挂 1~3 个）——几何每次重建都新建，避免重建时被 dispose 掉 */
 const sensorMat = new THREE.MeshBasicMaterial({color: 0x3fb6e8});
-const SENSORS = [];
-RACK_X.forEach((x) => {
-  [1, 2].forEach(k => {
-    const s = new THREE.Mesh(sensorGeo, sensorMat);
-    s.position.set(x + (k === 1 ? -2.6 : 2.6), 4.72, 0);
-    scene.add(s);
-    SENSORS.push(s);
+
+function makeSensors(rackPos, rackH, perRack) {
+  const out = [];
+  if (!perRack) return out;
+  const geo = new THREE.SphereGeometry(0.055, 8, 6);
+  rackPos.forEach(({x, z}) => {
+    for (let k = 0; k < perRack; k++) {
+      const s = new THREE.Mesh(geo, sensorMat);
+      const px = perRack === 1 ? x : x + RACK_W * (k / (perRack - 1) - 0.5) * 0.82;
+      s.position.set(px, rackH + 0.08, z);
+      DYN.add(s);
+      out.push(s);
+    }
   });
-});
+  return out;
+}
 
 /* 告警环 */
 const alarmRing = new THREE.Mesh(
@@ -53591,37 +53679,367 @@ const wheels = [];
   wheels.push(wl);
 });
 
-agv.position.set(-11.5, 0, 3.6);
+const agvCamParts = [camBox, camLens];
+agv.position.copy(AGV_START);
 scene.add(agv);
 
-/* 路径线 */
-const WP = [
-  new THREE.Vector3(-11.5, 0.03, 3.6),
-  new THREE.Vector3(-9, 0.03, 3.6),
-  new THREE.Vector3(0, 0.03, 3.6),
-  new THREE.Vector3(0, 0.03, 2.75),
-];
-const pathGeo = new THREE.BufferGeometry().setFromPoints(WP);
-const pathLine = new THREE.Line(pathGeo, new THREE.LineDashedMaterial({color: 0x3fb6e8, dashSize: 0.28, gapSize: 0.2, transparent: true, opacity: 0.35}));
-pathLine.computeLineDistances();
+/* 路径线（几何在重建时替换） */
+let pathLine = new THREE.Line(new THREE.BufferGeometry(), new THREE.LineDashedMaterial({color: 0x3fb6e8, dashSize: 0.28, gapSize: 0.2, transparent: true, opacity: 0.35}));
 scene.add(pathLine);
 
-/* 标签 */
-const labEls = [];
-RACK_X.forEach((x, i) => {
-  const d = document.createElement('div');
-  d.className = 'lab';
-  d.textContent = (i + 1) + ' 号架位';
-  d.style.display = 'none';
-  document.getElementById('labels').appendChild(d);
-  labEls.push({el: d, pos: new THREE.Vector3(x, 5.1, 0.9), idx: i});
-});
+/* 标签：架位标签随配置生成，AGV 标签固定 */
 const agvLab = document.createElement('div');
 agvLab.className = 'lab';
 agvLab.textContent = 'myAGV';
 document.getElementById('labels').appendChild(agvLab);
 
-/* 视口 */
+/* ---------------- 配件模块库 ---------------- */
+const PROP_TYPES = {
+  beacon: {
+    label: '声光报警器',
+    make() {
+      const g = new THREE.Group();
+      const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 1.5, 10), M.agvDark);
+      pole.position.y = 0.75; g.add(pole);
+      const lamp = new THREE.Mesh(new THREE.SphereGeometry(0.16, 14, 10), new THREE.MeshBasicMaterial({color: 0xcf4438}));
+      lamp.position.y = 1.55; g.add(lamp);
+      const plate = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.2, 0.04, 12), M.frame);
+      plate.position.y = 0.02; g.add(plate);
+      return g;
+    },
+  },
+  charger: {
+    label: '充电桩',
+    make() {
+      const g = new THREE.Group();
+      const box = new THREE.Mesh(new THREE.BoxGeometry(0.5, 1.2, 0.35), M.agvDark);
+      box.position.y = 0.6; g.add(box);
+      const led = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.05, 0.02), M.cyanLine);
+      led.position.set(0, 1.0, 0.19); g.add(led);
+      return g;
+    },
+  },
+  camera: {
+    label: '云台摄像头',
+    make() {
+      const g = new THREE.Group();
+      const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.045, 2.6, 10), M.frame);
+      pole.position.y = 1.3; g.add(pole);
+      const head = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.18, 0.3), M.agvDark);
+      head.position.y = 2.68; g.add(head);
+      const lens = new THREE.Mesh(new THREE.CylinderGeometry(0.055, 0.055, 0.04, 12), M.cyanLine);
+      lens.rotation.x = Math.PI / 2;
+      lens.position.set(0, 2.68, 0.16); g.add(lens);
+      return g;
+    },
+  },
+  tank: {
+    label: '储液罐',
+    make() {
+      const g = new THREE.Group();
+      const body = new THREE.Mesh(new THREE.CylinderGeometry(0.45, 0.45, 1.3, 18), M.tank);
+      body.position.y = 0.65; g.add(body);
+      const ring = new THREE.Mesh(new THREE.CylinderGeometry(0.46, 0.46, 0.05, 18), M.cyanLine);
+      ring.position.y = 1.31; g.add(ring);
+      return g;
+    },
+  },
+  bench: {
+    label: '操作台',
+    make() {
+      const g = new THREE.Group();
+      const top = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.06, 0.7), M.tray);
+      top.position.y = 0.9; g.add(top);
+      [[-0.6, -0.28], [0.6, -0.28], [-0.6, 0.28], [0.6, 0.28]].forEach(([px, pz]) => {
+        const leg = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.9, 0.06), M.frame);
+        leg.position.set(px, 0.45, pz); g.add(leg);
+      });
+      return g;
+    },
+  },
+};
+
+function disposeTree(obj) {
+  obj.traverse(o => { if (o.geometry) o.geometry.dispose(); });
+}
+
+function rebuildProps() {
+  while (PROP_GROUP.children.length) disposeTree(PROP_GROUP.children.pop());
+  (CFG.props || []).forEach(p => {
+    const def = PROP_TYPES[p.type];
+    if (!def) return;
+    const g = def.make();
+    g.position.set(p.x, 0, p.z);
+    g.rotation.y = p.rot || 0;
+    PROP_GROUP.add(g);
+  });
+}
+
+/* ---------------- 场景重建 ---------------- */
+/* 把相机放到“全景位”：按架位铺开的宽度算半径，并同步 OrbitLite 的球坐标状态
+   （不同步的话 controls.update() 会用旧半径把相机弹回去） */
+function applyHome() {
+  controls.target.copy(CAM_TARGET);
+  const off = CAM_HOME.clone().sub(CAM_TARGET);
+  const r = Math.max(0.001, off.length());
+  const theta = Math.atan2(off.x, off.z);
+  const phi = Math.acos(Math.max(-1, Math.min(1, off.y / r)));
+  controls.radius = controls.tRadius = r;
+  controls.theta = controls.tTheta = theta;
+  controls.phi = controls.tPhi = phi;
+  camera.position.copy(CAM_HOME);
+  controls.update();
+}
+
+function fitCamera(spanX, spanZ) {
+  const R = Math.max(15, spanX * 0.78 + 11);      // 水平视宽 ≈ 2R·tan(36°)，整排架位占约八成宽
+  const elev = 0.49;                              // 俯角约 28°，三排架位和走道都看得清
+  const yaw = -0.08;
+  CAM_TARGET.set(0, 3.0, -0.5);
+  CAM_HOME.set(
+    CAM_TARGET.x + R * Math.cos(elev) * Math.sin(yaw),
+    CAM_TARGET.y + R * Math.sin(elev),
+    CAM_TARGET.z + R * Math.cos(elev) * Math.cos(yaw)
+  );
+  controls.minDistance = Math.max(8, R * 0.4);
+  controls.maxDistance = R * 2.2;
+  applyHome();
+}
+
+function buildWorld() {
+  while (DYN.children.length) disposeTree(DYN.children.pop());
+  if (leaves) { leaves.geometry.dispose(); leaves.material.dispose(); leaves = null; }
+  labEls.forEach(l => l.el.remove());
+  labEls = [];
+  alarmLabEl = null;
+
+  const rows = CFG.rows, cols = CFG.cols, layers = CFG.layers;
+  CFG.alertRow = Math.max(0, Math.min(CFG.alertRow, rows - 1));
+  CFG.alertCol = Math.max(0, Math.min(CFG.alertCol, cols - 1));
+
+  SHELF_Y = [];
+  for (let i = 0; i < layers; i++) SHELF_Y.push(BASE_Y + i * LAYER_GAP);
+  RACK_H = BASE_Y + (layers - 1) * LAYER_GAP + 0.8;
+
+  const PX = RACK_W + GAP_X, PZ = RACK_D + GAP_Z;
+  const spanX = (cols - 1) * PX, spanZ = (rows - 1) * PZ;
+  const rackX = c => -spanX / 2 + c * PX;
+  const rackZ = r => spanZ / 2 - r * PZ;          // 第 1 行在最前面，编号从近到远
+  const frontZ = r => rackZ(r) + RACK_D / 2;
+  const aisleZ = r => rackZ(r) + RACK_D / 2 + 1.35;
+
+  const rackPos = [];
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      const x = rackX(c), z = rackZ(r);
+      rackPos.push({x, z, r, c});
+      const g = makeRack(SHELF_Y, RACK_H);
+      g.position.set(x, 0, z);
+      DYN.add(g);
+    }
+  }
+
+  for (let r = 0; r < rows; r++) {
+    const strip = new THREE.Mesh(
+      new THREE.BoxGeometry(spanX + RACK_W + 6, 0.02, 1.3),
+      new THREE.MeshBasicMaterial({color: 0x10283d})
+    );
+    strip.position.set(0, 0.011, aisleZ(r));
+    DYN.add(strip);
+  }
+
+  leaves = makeLeaves(rackPos, SHELF_Y, CFG.plants);
+  DYN.add(leaves);
+  makeSensors(rackPos, RACK_H, CFG.sensorPerRack);
+
+  rackPos.forEach(({x, z, r, c}) => {
+    const d = document.createElement('div');
+    d.className = 'lab';
+    d.textContent = (r + 1) + '-' + (c + 1);
+    d.style.display = 'none';
+    document.getElementById('labels').appendChild(d);
+    const alarm = r === CFG.alertRow && c === CFG.alertCol;
+    const rec = {el: d, pos: new THREE.Vector3(x, RACK_H + 1.1, z + 0.6), r, c, front: r === 0, alarm};
+    labEls.push(rec);
+    if (alarm) alarmLabEl = rec;
+  });
+
+  const tx = rackX(CFG.alertCol), az = aisleZ(CFG.alertRow);
+  AGV_START.set(rackX(0) - 1.2, 0, az);
+  WP = [
+    new THREE.Vector3(AGV_START.x, 0.03, az),
+    new THREE.Vector3(tx, 0.03, az),
+    new THREE.Vector3(tx, 0.03, frontZ(CFG.alertRow) + 0.55),
+  ];
+  pathLine.geometry.dispose();
+  pathLine.geometry = new THREE.BufferGeometry().setFromPoints(WP);
+  pathLine.computeLineDistances();
+  agv.position.set(AGV_START.x, 0, AGV_START.z);
+  agv.rotation.y = Math.PI / 2;
+
+  alarmRing.position.set(tx, SHELF_Y[Math.min(2, layers - 1)] + 0.14, frontZ(CFG.alertRow) - 0.3);
+  alarmRing.visible = false;
+
+  cab.visible = CFG.cabOn;
+  fert.visible = CFG.fertOn;
+  cab.position.set(rackX(0) - RACK_W / 2 - 4.8, 0, rackZ(rows - 1) + 1.6);
+  fert.position.set(rackX(cols - 1) + RACK_W / 2 + 4.4, 0, rackZ(rows - 1) + 1.6);
+  agvCamParts.forEach(o => { o.visible = CFG.agvCam; });
+
+  const total = rows * cols;
+  const ptEl = document.getElementById('s-pt');
+  if (ptEl) ptEl.innerHTML = total + '<small>/' + total + '</small>';
+  const ptCount = document.getElementById('pt-count');
+  if (ptCount) ptCount.textContent = rows + ' 行 × ' + cols + ' 列';
+  const gridEl = document.getElementById('pt-grid');
+  gridEl.style.gridTemplateColumns = 'repeat(' + cols + ', 1fr)';
+  gridEl.innerHTML = '';
+  rackPos.forEach(({r, c}) => {
+    const cell = document.createElement('div');
+    cell.className = 'cell';
+    cell.id = 'pt-' + r + '-' + c;
+    cell.innerHTML = '<i></i>' + (r + 1) + '-' + (c + 1);
+    gridEl.appendChild(cell);
+  });
+  const alertText = document.getElementById('alert-text');
+  if (alertText) {
+    alertText.innerHTML = (CFG.alertRow + 1) + ' 行 ' + (CFG.alertCol + 1) + ' 列 · 第 ' +
+      Math.min(3, layers) + ' 层<br/>EC 1.42 低于下限 1.6';
+  }
+  const taskPt = document.getElementById('task-pt');
+  if (taskPt) {
+    taskPt.textContent = (CFG.alertRow + 1) + ' 行 ' + (CFG.alertCol + 1) + ' 列 · 第 ' + Math.min(3, layers) + ' 层';
+  }
+
+  rebuildProps();
+  fitCamera(spanX, spanZ);
+  saveCfg();
+}
+
+/* ---------------- 配置持久化 ---------------- */
+function saveCfg() {
+  try { localStorage.setItem('plantFactoryDemo.cfg', JSON.stringify(CFG)); } catch (e) {}
+}
+function loadCfg() {
+  try {
+    const s = localStorage.getItem('plantFactoryDemo.cfg');
+    if (s) Object.assign(CFG, JSON.parse(s));
+  } catch (e) {}
+}
+
+/* ---------------- 编辑面板 ---------------- */
+const range = n => Array.from({length: n}, (_, i) => i);
+
+function fillSelect(id, values, current, labeler) {
+  const el = document.getElementById(id);
+  el.innerHTML = '';
+  values.forEach(v => {
+    const o = document.createElement('option');
+    o.value = String(v);
+    o.textContent = labeler ? labeler(v) : String(v);
+    if (String(v) === String(current)) o.selected = true;
+    el.appendChild(o);
+  });
+}
+
+function renderPropList() {
+  const box = document.getElementById('em-prop-list');
+  box.innerHTML = '';
+  if (!CFG.props.length) {
+    box.innerHTML = '<div class="pl"><b>暂无自由摆放的配件</b></div>';
+    return;
+  }
+  CFG.props.forEach((p, i) => {
+    const def = PROP_TYPES[p.type];
+    const row = document.createElement('div');
+    row.className = 'pl';
+    row.innerHTML = '<b>' + (def ? def.label : p.type) + '　(' + p.x.toFixed(1) + ', ' + p.z.toFixed(1) + ')</b>';
+    const del = document.createElement('span');
+    del.textContent = '删除';
+    del.onclick = () => { CFG.props.splice(i, 1); rebuildProps(); renderPropList(); saveCfg(); };
+    row.appendChild(del);
+    box.appendChild(row);
+  });
+}
+
+function openEditor() {
+  fillSelect('em-rows', [1, 2, 3], CFG.rows);
+  fillSelect('em-cols', [1, 2, 3, 4, 5, 6], CFG.cols);
+  fillSelect('em-layers', [2, 3, 4, 5], CFG.layers);
+  fillSelect('em-plants', [8, 12, 16, 20, 24], CFG.plants);
+  fillSelect('em-sensors', [0, 1, 2, 3], CFG.sensorPerRack);
+  fillSelect('em-arow', range(CFG.rows), CFG.alertRow, i => '第 ' + (i + 1) + ' 行');
+  fillSelect('em-acol', range(CFG.cols), CFG.alertCol, i => '第 ' + (i + 1) + ' 列');
+
+  document.querySelectorAll('.chip[data-flag]').forEach(ch => {
+    ch.classList.toggle('on', !!CFG[ch.dataset.flag]);
+    ch.onclick = () => {
+      CFG[ch.dataset.flag] = !CFG[ch.dataset.flag];
+      ch.classList.toggle('on', CFG[ch.dataset.flag]);
+    };
+  });
+
+  const wrap = document.getElementById('em-prop-types');
+  if (!wrap.children.length) {
+    Object.entries(PROP_TYPES).forEach(([k, def]) => {
+      const b = document.createElement('div');
+      b.className = 'chip place';
+      b.dataset.prop = k;
+      b.textContent = '＋ ' + def.label;
+      b.onclick = () => startPlace(k);
+      wrap.appendChild(b);
+    });
+  }
+  renderPropList();
+  document.getElementById('edit-modal').classList.add('on');
+}
+
+function closeEditor() {
+  document.getElementById('edit-modal').classList.remove('on');
+}
+
+function applyEditor() {
+  CFG.rows = +document.getElementById('em-rows').value;
+  CFG.cols = +document.getElementById('em-cols').value;
+  CFG.layers = +document.getElementById('em-layers').value;
+  CFG.plants = +document.getElementById('em-plants').value;
+  CFG.sensorPerRack = +document.getElementById('em-sensors').value;
+  CFG.alertRow = +document.getElementById('em-arow').value;
+  CFG.alertCol = +document.getElementById('em-acol').value;
+  closeEditor();
+  buildWorld();
+  resetRun();
+}
+
+/* 配件放置：选中类型后点地面落位 */
+let placing = null;
+
+function startPlace(type) {
+  placing = type;
+  const def = PROP_TYPES[type];
+  document.getElementById('place-name').textContent = def ? def.label : type;
+  document.getElementById('place-hint').style.display = 'block';
+  closeEditor();
+}
+
+const ray = new THREE.Raycaster();
+let downXY = null;
+document.getElementById('scene').addEventListener('pointerdown', e => { downXY = {x: e.clientX, y: e.clientY}; });
+document.getElementById('scene').addEventListener('pointerup', e => {
+  if (!placing) return;
+  if (downXY && Math.hypot(e.clientX - downXY.x, e.clientY - downXY.y) > 6) return;
+  const ndc = new THREE.Vector2((e.clientX / W()) * 2 - 1, -(e.clientY / H()) * 2 + 1);
+  ray.setFromCamera(ndc, camera);
+  const hit = ray.intersectObject(floor, false)[0];
+  if (!hit) return;
+  CFG.props.push({type: placing, x: +hit.point.x.toFixed(2), z: +hit.point.z.toFixed(2), rot: 0});
+  placing = null;
+  document.getElementById('place-hint').style.display = 'none';
+  rebuildProps();
+  saveCfg();
+});
+
+/* ---------------- 视口 ---------------- */
 function onResize() {
   camera.aspect = W() / H();
   camera.updateProjectionMatrix();
@@ -53661,9 +54079,12 @@ function showTask(show) {
 
 function showAlert(show) {
   $('alert-box').style.display = show ? 'block' : 'none';
-  $('pt-1').classList.toggle('alarm', show);
-  $('pt-1').querySelector('.s').textContent = show ? 'EC 越限' : '正常';
-  labEls[1].el.classList.toggle('alarm', show);
+  const cell = $('pt-' + CFG.alertRow + '-' + CFG.alertCol);
+  if (cell) {
+    cell.classList.toggle('alarm', show);
+    cell.querySelector('.s') && (cell.querySelector('.s').textContent = show ? 'EC 越限' : '正常');
+  }
+  if (alarmLabEl) alarmLabEl.el.classList.toggle('alarm', show);
   alarmRing.visible = show;
 }
 
@@ -53679,14 +54100,16 @@ function flash() {
   setTimeout(() => { f.style.opacity = '0'; }, 140);
 }
 
-const REC_TEXT =
-  '巡检记录  #R-1127-02\n' +
-  '点位　2 号架位 · 第 3 层\n' +
-  '触发　EC 1.42 mS/cm 低于下限 1.6\n' +
-  '复核　冠层覆盖度 61.4%，叶色指数偏低\n' +
-  '判定　营养液浓度偏低，轻微缺素\n' +
-  '置信　0.91（高于阈值 0.75）\n' +
-  '状态　待人工确认';
+function recText() {
+  const layer = Math.min(3, CFG.layers);
+  return '巡检记录  #R-1127-02\n' +
+    '点位　' + (CFG.alertRow + 1) + ' 行 ' + (CFG.alertCol + 1) + ' 列 · 第 ' + layer + ' 层\n' +
+    '触发　EC 1.42 mS/cm 低于下限 1.6\n' +
+    '复核　冠层覆盖度 61.4%，叶色指数偏低\n' +
+    '判定　营养液浓度偏低，轻微缺素\n' +
+    '置信　0.91（高于阈值 0.75）\n' +
+    '状态　待人工确认';
+}
 
 function goAlarm() {
   S.phase = 'alarm';
@@ -53711,7 +54134,7 @@ function goRecognize() {
   setStep(3, 'ok'); setStep(4, 'on');
   flash();
   setTimeout(() => {
-    setRec(REC_TEXT);
+    setRec(recText());
     setStep(4, 'ok'); setStep(5, 'on');
     setTimeout(() => {
       setStep(5, 'ok'); setStep(6, 'on');
@@ -53773,8 +54196,9 @@ function resetRun() {
   $('confirm').classList.remove('done');
   $('verdict').style.display = 'none';
   $('btn-start').textContent = '开始巡检';
-  agv.position.set(-11.5, 0, 3.6);
-  agv.rotation.y = 0;
+  navT = 0;
+  agv.position.set(AGV_START.x, 0, AGV_START.z);
+  agv.rotation.y = Math.PI / 2;
 }
 
 $('btn-start').onclick = startRun;
@@ -53782,9 +54206,7 @@ $('btn-step').onclick = stepOnce;
 $('btn-reset').onclick = resetRun;
 $('confirm').onclick = confirmAction;
 $('btn-view').onclick = () => {
-  camera.position.copy(CAM_HOME);
-  controls.target.copy(CAM_TARGET);
-  controls.update();
+  applyHome();
 };
 $('btn-light').onclick = () => {
   S.night = !S.night;
@@ -53794,9 +54216,33 @@ $('btn-light').onclick = () => {
   scene.background.set(S.night ? 0x02040a : 0x05080f);
 };
 
+/* 编辑面板与配件放置的交互 */
+$('btn-edit').onclick = openEditor;
+$('em-cancel').onclick = closeEditor;
+$('em-x').onclick = closeEditor;
+$('em-apply').onclick = applyEditor;
+$('em-reset').onclick = () => {
+  Object.keys(CFG).forEach(k => delete CFG[k]);
+  Object.assign(CFG, JSON.parse(JSON.stringify(DEFAULT_CFG)));
+  try { localStorage.removeItem('plantFactoryDemo.cfg'); } catch (e) {}
+  closeEditor();
+  buildWorld();
+  resetRun();
+};
+$('edit-modal').addEventListener('click', e => { if (e.target.id === 'edit-modal') closeEditor(); });
+window.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    if (placing) {
+      placing = null;
+      $('place-hint').style.display = 'none';
+    } else {
+      closeEditor();
+    }
+  }
+});
+
 /* ---------------- 动画 ---------------- */
 const clock = new THREE.Clock();
-let navT = 0;
 
 function updateAgv(dt) {
   if (S.phase !== 'navigate') return;
@@ -53838,6 +54284,8 @@ function updateAgv(dt) {
 function updateLabels() {
   const halfW = W() / 2, halfH = H() / 2;
   labEls.forEach(l => {
+    // 3D 里只留告警点位的标签，其余靠左侧点位表，避免 15 个标签糊在架面上
+    if (!l.alarm) { l.el.style.display = 'none'; return; }
     const v = l.pos.clone().project(camera);
     const x = v.x * halfW + halfW;
     const y = -v.y * halfH + halfH;
@@ -53881,10 +54329,14 @@ function loop() {
   controls.update();
   renderer.render(scene, camera);
 }
+/* 初始化：读回上次的配置并建场景 */
+loadCfg();
+buildWorld();
+resetRun();
 loop();
 
-/* 调试/讲解用入口：控制台可逐步驱动 */
-window.__demo = {S, agv, goAlarm, goDispatch, goNavigate, goRecognize, confirmAction};
+/* 调试/讲解用入口：控制台可逐步驱动，也可改 CFG 后 rebuild */
+window.__demo = {S, agv, CFG, camera, controls, scene, renderer, buildWorld, rebuildProps, saveCfg, PROP_TYPES, goAlarm, goDispatch, goNavigate, goRecognize, confirmAction};
 
 setTimeout(() => {
   const b = $('boot');
