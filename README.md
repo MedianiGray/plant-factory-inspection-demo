@@ -5,6 +5,9 @@
 广西农业职业技术大学 信息工程学院 · 网络工程技术（本）2502 · 覃祖悦
 人工智能课程 任务二（项目设计练习）配套 demo
 
+**在线预览**：https://medianigray.github.io/plant-factory-inspection-demo/
+**仓库地址**：https://github.com/MedianiGray/plant-factory-inspection-demo
+
 ![初始状态](screenshots/01-initial.png)
 
 <table>
