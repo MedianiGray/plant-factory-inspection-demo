@@ -148,6 +148,25 @@
   #scene.placing{cursor:crosshair;}
   .em-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:18px;padding-top:12px;border-top:1px solid var(--line);}
 
+  /* 官方资料面板 */
+  #ref-modal{position:fixed;inset:0;z-index:60;display:none;align-items:center;justify-content:center;background:rgba(4,7,13,0.74);}
+  #ref-modal.on{display:flex;}
+  #ref-card{width:min(780px,93vw);max-height:88vh;overflow-y:auto;background:#0a1322;border:1px solid var(--line);padding:16px 20px 18px;box-shadow:0 18px 60px rgba(0,0,0,.6);}
+  #ref-card::-webkit-scrollbar{width:4px;}
+  #ref-card::-webkit-scrollbar-thumb{background:rgba(70,120,180,0.5);}
+  .rlist{display:flex;flex-direction:column;gap:8px;}
+  .ritem{display:grid;grid-template-columns:1fr auto;gap:3px 10px;text-decoration:none;color:inherit;
+    border:1px solid rgba(70,120,180,0.28);padding:9px 12px;transition:border-color .18s,background .18s;}
+  .ritem:hover{border-color:var(--cyan);background:rgba(63,182,232,0.06);}
+  .ritem b{font-size:12px;color:#e6f4ff;font-weight:600;letter-spacing:.4px;}
+  .ritem i{font-style:normal;font-size:9.5px;color:#5f7b95;font-family:Consolas,monospace;text-align:right;white-space:nowrap;}
+  .ritem em{grid-column:1 / -1;font-style:normal;font-size:10.5px;line-height:1.85;color:#8fadc8;}
+  .ainote p{font-size:11px;line-height:1.95;color:#8fadc8;margin:0 0 7px;}
+  .ainote p:last-child{margin-bottom:0;}
+  .ainote b{color:#cfe0f2;font-weight:600;}
+  .rfoot{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:16px;padding-top:12px;border-top:1px solid var(--line);}
+  .rfoot small{font-size:9.5px;color:#43596f;line-height:1.7;}
+
   #place-hint{position:fixed;left:50%;transform:translateX(-50%);bottom:106px;z-index:35;display:none;font-size:10.5px;color:#e4c07a;background:rgba(9,14,26,0.92);border:1px solid rgba(228,192,122,0.4);padding:7px 14px;}
 
   /* 窄屏适配：投屏或小窗口时不挤压、不叠字 */
@@ -232,7 +251,7 @@
 </aside>
 
 <div id="hud-bottom">
-  <div id="note">演示用原型：场景与数值为模拟，用于呈现任务流转与人机边界；真实点位、阈值以实训室平台为准。&nbsp;v1.2.0</div>
+  <div id="note">演示用原型：场景与数值为模拟，用于呈现任务流转与人机边界；真实点位、阈值以实训室平台为准。&nbsp;v1.3.0</div>
   <div class="row">
     <div class="btn primary" id="btn-start">开始巡检</div>
     <div class="btn" id="btn-step">单步</div>
@@ -240,6 +259,7 @@
     <div class="btn" id="btn-view">视角复位</div>
     <div class="btn" id="btn-light">昼 / 夜</div>
     <div class="btn" id="btn-edit">编辑场景</div>
+    <div class="btn" id="btn-ref">官方资料</div>
   </div>
 </div>
 
@@ -281,6 +301,60 @@
       <div class="btn" id="em-reset">恢复默认</div>
       <div class="btn" id="em-cancel">取消</div>
       <div class="btn primary" id="em-apply">应用重建</div>
+    </div>
+  </div>
+</div>
+
+<div id="ref-modal">
+  <div id="ref-card">
+    <div class="em-title">官方资料 · 参考出处与成果<span id="ref-x">关闭</span></div>
+
+    <div class="em-sec">设备与平台<small>老师推荐的官网，现场点开就能对照</small></div>
+    <div class="rlist">
+      <a class="ritem" href="https://www.elephantrobotics.com/" target="_blank" rel="noopener">
+        <b>大象机器人 Elephant Robotics</b><i>elephantrobotics.com</i>
+        <em>看 myAGV 的产品形态、负载 / 续航 / 接口参数。本页这台移动巡检车按它的外形比例与轴距建模，巡检动作也照它的运动方式设计。</em>
+      </a>
+      <a class="ritem" href="https://www.openharmony.cn/HomePage" target="_blank" rel="noopener">
+        <b>OpenHarmony 开源鸿蒙</b><i>openharmony.cn</i>
+        <em>看设备侧操作系统与分布式能力。本页「终端 — 边缘 — 云」三层里，终端与边缘那一层对应的就是这类设备侧底座。</em>
+      </a>
+      <a class="ritem" href="https://www.kaihong.com/" target="_blank" rel="noopener">
+        <b>开鸿 Kaihong</b><i>kaihong.com</i>
+        <em>看 KaihongOS 与国产化行业落地（电力、农业、教育）。讲「信创环境下的边缘盒」时，用它的方案作参照。</em>
+      </a>
+      <a class="ritem" href="https://weixin.qq.com/sph/AFZkQOiIxC" target="_blank" rel="noopener">
+        <b>产品演示 · 视频号（一）</b><i>weixin.qq.com/sph/AFZkQOiIxC</i>
+        <em>老师转的实际运行视频。展示或答辩时可当场打开，和本页三维场景对照着看真机动作。</em>
+      </a>
+      <a class="ritem" href="https://weixin.qq.com/sph/AwV9cIu9L6" target="_blank" rel="noopener">
+        <b>产品演示 · 视频号（二）</b><i>weixin.qq.com/sph/AwV9cIu9L6</i>
+        <em>另一段演示。两段一起看，能对上「固定监测点 + 移动复核」的完整流程。</em>
+      </a>
+    </div>
+
+    <div class="em-sec">本项目成果<small>这一页本身，以及能拷走、能断网运行的版本</small></div>
+    <div class="rlist">
+      <a class="ritem" href="https://medianigray.github.io/plant-factory-inspection-demo/" target="_blank" rel="noopener">
+        <b>在线展示页（就是这一页）</b><i>medianigray.github.io/plant-factory-inspection-demo</i>
+        <em>三维场景 + 十类配件 + 三套布局模板 + 配置导入导出，浏览器打开即用，不用装任何东西。</em>
+      </a>
+      <a class="ritem" href="download/plant-factory-demo-1.3.0.zip">
+        <b>本地演示包 v1.3.0（可下载）</b><i>download/plant-factory-demo-1.3.0.zip</i>
+        <em>解压后双击「启动演示.bat」，断网也能跑；拷 U 盘、打包进虚拟机镜像都行。</em>
+      </a>
+    </div>
+
+    <div class="em-sec">关于 AI 辅助<small>现场讲解时可直接念</small></div>
+    <div class="ainote">
+      <p>同样的 AI，不同的人用，产出差别很大。<b>提示词里带多少领域判断，页面就有多少专业度。</b></p>
+      <p>这一页就是「人会判断、AI 会实现」的例子：三维场景、十类配件、告警联动由提示词驱动生成；巡检逻辑、验收标准、哪些数据必须真实，由我来定。</p>
+      <p>以现在的能力，我独立写不出这样的页面；但把需求说清楚、把结果逐条验一遍，就能把它做出来。<b>合理使用 AI 辅助学习，事半功倍——它替代的是重复实现，不是判断。</b></p>
+    </div>
+
+    <div class="rfoot">
+      <small>链接若在校内网络打不开，用手机热点或直接照着域名手动访问。</small>
+      <div class="btn" id="ref-close">关闭</div>
     </div>
   </div>
 </div>
@@ -54413,6 +54487,12 @@ $('btn-light').onclick = () => {
 
 /* 编辑面板与配件放置的交互 */
 $('btn-edit').onclick = openEditor;
+function openRef(){ $('ref-modal').classList.add('on'); }
+function closeRef(){ $('ref-modal').classList.remove('on'); }
+$('btn-ref').onclick = openRef;
+$('ref-x').onclick = closeRef;
+$('ref-close').onclick = closeRef;
+$('ref-modal').onclick = (e) => { if (e.target.id === 'ref-modal') closeRef(); };
 $('em-cancel').onclick = closeEditor;
 $('em-x').onclick = closeEditor;
 $('em-apply').onclick = applyEditor;
