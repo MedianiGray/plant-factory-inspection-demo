@@ -7,7 +7,7 @@
 
 **在线预览**：https://medianigray.github.io/plant-factory-inspection-demo/
 **仓库地址**：https://github.com/MedianiGray/plant-factory-inspection-demo
-**本地版下载**：[plant-factory-demo-1.4.0.zip](https://medianigray.github.io/plant-factory-inspection-demo/download/plant-factory-demo-1.4.0.zip)（解压后双击「启动演示.bat」，会用应用窗口打开；不依赖 GitHub 域名，校内网络也能下）
+**本地版下载**：[plant-factory-demo-1.5.0.zip](https://medianigray.github.io/plant-factory-inspection-demo/download/plant-factory-demo-1.5.0.zip)（解压后双击「启动演示.bat」，会用应用窗口打开；不依赖 GitHub 域名，校内网络也能下）
 
 ![初始状态](screenshots/01-overview.png)
 
@@ -85,7 +85,7 @@
 | [开鸿 Kaihong](https://www.kaihong.com/) | KaihongOS 与国产化行业落地（电力、农业、教育） | 讲「信创环境下的边缘盒」时的参照方案 |
 | [视频号演示（一）](https://weixin.qq.com/sph/AFZkQOiIxC)、[（二）](https://weixin.qq.com/sph/AwV9cIu9L6) | 真机实际运行 | 和本页三维场景对照着看，验证「固定监测点 + 移动复核」的流程 |
 
-**本项目成果**：在线展示页（就是这一页）＋ 可下载的本地包 v1.4.0，断网也能跑。
+**本项目成果**：在线展示页（就是这一页）＋ 可下载的本地包 v1.5.0，断网也能跑。
 
 **关于 AI 辅助**：同样的 AI，不同的人用，产出差别很大——提示词里带多少领域判断，页面就有多少专业度。这一页是「人会判断、AI 会实现」的例子：三维场景、十类配件、告警联动由提示词驱动生成，巡检逻辑与验收标准由作者定义。以现在的能力独立写不出这样的页面，但把需求说清楚、把结果逐条验一遍，就能做出来；AI 替代的是重复实现，不是判断。
 
@@ -102,6 +102,15 @@
 **三 · 效果展示**：三张实际截图（官方资料面板、到点复核、场景编辑），点开就是全屏大图。三张图都内嵌在 `index.html` 里，断网也看得到。
 
 三块内容都落在这一个页面里：模式讲怎么读，PPT 讲怎么复述，截图给可当场核对的现场。
+
+## 时效与自检（页面自己报数）
+
+这一页不做「已上线」式的宣告，能当场对的东西都放在明面上：
+
+- **顶栏右侧 LIVE 条**：本机时间每秒跳动，旁边是最近复核日期。看一眼就知道这份页面是新的还是旧的。
+- **底栏末尾**：本次加载的真实体积与耗时，由浏览器 `encodedBodySize` 直接读出，不写死；页面加了东西，这个数就跟着变。
+- **汇报材料面板底部**：每打开一次打上当时的时间，连同「四步模式 / 9 页 PPT / 3 张实测截图 / 控制台 0 报错」一起写在行末。
+- **截图都内嵌**：断网、拷 U 盘、投屏离线也看得到同样三张图，不依赖外链。
 
 ## 为什么需要它
 
@@ -138,7 +147,7 @@
 
 ```
 index.html            单文件演示页（内嵌 three.js，离线可用；底栏「官方资料」面板）
-download/             本地程序包 v1.4.0（Pages 直下，不依赖 github.com）
+download/             本地程序包 v1.5.0（Pages 直下，不依赖 github.com）
 release/              本地程序包 zip 的本地副本
 docs/design.md        方案设计与技术取舍
 screenshots/          演示截图：全景 / 到点复核 / 场景编辑 / 配件近景 / 夜间
