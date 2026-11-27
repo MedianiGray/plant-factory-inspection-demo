@@ -7,7 +7,7 @@
 
 **在线预览**：https://medianigray.github.io/plant-factory-inspection-demo/
 **仓库地址**：https://github.com/MedianiGray/plant-factory-inspection-demo
-**本地版下载**：[plant-factory-demo-1.2.0.zip](https://github.com/MedianiGray/plant-factory-inspection-demo/releases/latest/download/plant-factory-demo-1.2.0.zip)（解压后双击「启动演示.bat」，会用应用窗口打开）
+**本地版下载**：[plant-factory-demo-1.3.0.zip](https://medianigray.github.io/plant-factory-inspection-demo/download/plant-factory-demo-1.3.0.zip)（解压后双击「启动演示.bat」，会用应用窗口打开；不依赖 GitHub 域名，校内网络也能下）
 
 ![初始状态](screenshots/01-overview.png)
 
@@ -70,6 +70,25 @@
 
 三种方式跑的是同一份页面，没有额外依赖。本地包里那个 bat 有 Edge 就 `msedge --app=…` 开一个应用窗口（没有标签栏、地址栏，看着就是个独立程序），没有 Edge 就退回系统默认浏览器。页面配置会自动存进浏览器 localStorage，下次打开还是上次的样子。
 
+## 官方资料与出处（页面里点「官方资料」）
+
+![官方资料面板](screenshots/06-official.png)
+
+底栏右上有一个「官方资料」按钮，点开是独立面板，分三块：
+
+**设备与平台**（老师推荐的官网，现场点开就能对照）
+
+| 入口 | 看什么 | 与本页的关系 |
+|---|---|---|
+| [大象机器人 Elephant Robotics](https://www.elephantrobotics.com/) | myAGV 的产品形态、负载 / 续航 / 接口参数 | 本页移动巡检车按它的外形比例与轴距建模，巡检动作也照它的运动方式设计 |
+| [OpenHarmony 开源鸿蒙](https://www.openharmony.cn/HomePage) | 设备侧操作系统与分布式能力 | 「终端 — 边缘 — 云」三层里的终端与边缘层，对应它的设备侧底座 |
+| [开鸿 Kaihong](https://www.kaihong.com/) | KaihongOS 与国产化行业落地（电力、农业、教育） | 讲「信创环境下的边缘盒」时的参照方案 |
+| [视频号演示（一）](https://weixin.qq.com/sph/AFZkQOiIxC)、[（二）](https://weixin.qq.com/sph/AwV9cIu9L6) | 真机实际运行 | 和本页三维场景对照着看，验证「固定监测点 + 移动复核」的流程 |
+
+**本项目成果**：在线展示页（就是这一页）＋ 可下载的本地包 v1.3.0，断网也能跑。
+
+**关于 AI 辅助**：同样的 AI，不同的人用，产出差别很大——提示词里带多少领域判断，页面就有多少专业度。这一页是「人会判断、AI 会实现」的例子：三维场景、十类配件、告警联动由提示词驱动生成，巡检逻辑与验收标准由作者定义。以现在的能力独立写不出这样的页面，但把需求说清楚、把结果逐条验一遍，就能做出来；AI 替代的是重复实现，不是判断。
+
 ## 为什么需要它
 
 固定侧能「持续盯着」，但有三处补不上的缺口：
@@ -104,8 +123,9 @@
 ## 目录
 
 ```
-index.html            单文件演示页（内嵌 three.js，离线可用）
-release/              本地程序包 zip（页面 + 启动脚本 + 使用说明）
+index.html            单文件演示页（内嵌 three.js，离线可用；底栏「官方资料」面板）
+download/             本地程序包 v1.3.0（Pages 直下，不依赖 github.com）
+release/              本地程序包 zip 的本地副本
 docs/design.md        方案设计与技术取舍
 screenshots/          演示截图：全景 / 到点复核 / 场景编辑 / 配件近景 / 夜间
 ```
