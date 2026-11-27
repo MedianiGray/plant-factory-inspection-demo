@@ -139,10 +139,13 @@
   .chip.on{color:var(--cyan);border-color:var(--cyan);background:rgba(63,182,232,0.1);}
   .chip.place{color:#e4c07a;border-color:rgba(228,192,122,0.45);}
   #em-prop-list{margin-top:8px;font-size:10px;color:#7f97b0;line-height:1.9;}
-  #em-prop-list .pl{display:flex;justify-content:space-between;gap:8px;}
-  #em-prop-list .pl b{color:#b9cde0;font-weight:400;}
-  #em-prop-list .pl span{color:var(--dim);cursor:pointer;}
-  #em-prop-list .pl span:hover{color:var(--warn);}
+  #em-prop-list .pl{display:flex;justify-content:space-between;align-items:center;gap:8px;}
+  #em-prop-list .pl b{color:#b9cde0;font-weight:400;flex:1;}
+  #em-prop-list .pl-act{display:flex;gap:9px;flex:none;}
+  #em-prop-list .pl-act i{font-style:normal;color:#8aa6c0;cursor:pointer;}
+  #em-prop-list .pl-act i:hover{color:#3fb6e8;}
+  #em-prop-list .pl-act i.rm:hover{color:var(--warn);}
+  #scene.placing{cursor:crosshair;}
   .em-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:18px;padding-top:12px;border-top:1px solid var(--line);}
 
   #place-hint{position:fixed;left:50%;transform:translateX(-50%);bottom:106px;z-index:35;display:none;font-size:10.5px;color:#e4c07a;background:rgba(9,14,26,0.92);border:1px solid rgba(228,192,122,0.4);padding:7px 14px;}
@@ -229,7 +232,7 @@
 </aside>
 
 <div id="hud-bottom">
-  <div id="note">演示用原型：场景与数值为模拟，用于呈现任务流转与人机边界；真实点位、阈值以实训室平台为准。</div>
+  <div id="note">演示用原型：场景与数值为模拟，用于呈现任务流转与人机边界；真实点位、阈值以实训室平台为准。&nbsp;v1.2.0</div>
   <div class="row">
     <div class="btn primary" id="btn-start">开始巡检</div>
     <div class="btn" id="btn-step">单步</div>
@@ -257,9 +260,19 @@
       <div class="chip" data-flag="fertOn">水肥一体机</div>
     </div>
 
-    <div class="em-sec">自由摆放配件<small>选中后点「放置」，再点地面落位</small></div>
+    <div class="em-sec">自由摆放配件<small>点类型后点地面落位，列表里可旋转 / 复制 / 删除</small></div>
     <div class="em-chips" id="em-prop-types"></div>
     <div id="em-prop-list"></div>
+
+    <div class="em-sec">布局模板<small>一键套用常见产线形态，已摆配件保留</small></div>
+    <div class="em-chips" id="em-presets"></div>
+
+    <div class="em-sec">场景配置存档<small>整份配置可导出分享、换机导入</small></div>
+    <div class="em-chips" id="em-io">
+      <div class="chip" id="em-export">导出配置 JSON</div>
+      <div class="chip" id="em-import">导入配置 JSON</div>
+    </div>
+    <input type="file" id="em-file" accept=".json,application/json" style="display:none"/>
 
     <div class="em-sec">告警点位</div>
     <div class="em-row"><label>行</label><select id="em-arow"></select><label>列</label><select id="em-acol"></select></div>
@@ -53694,6 +53707,13 @@ agvLab.textContent = 'myAGV';
 document.getElementById('labels').appendChild(agvLab);
 
 /* ---------------- 配件模块库 ---------------- */
+/* 类型库：每类配件一个工厂函数。新增配件只需在这里补一条，编辑面板的按钮会自动出现 */
+const PROP_EXTRA_MATS = {
+  crop: new THREE.MeshStandardMaterial({color: 0x2f6f45, roughness: 0.9}),
+  carton: new THREE.MeshStandardMaterial({color: 0xb9945f, roughness: 0.85}),
+  steel: new THREE.MeshStandardMaterial({color: 0x8d99a6, roughness: 0.6, metalness: 0.3}),
+};
+
 const PROP_TYPES = {
   beacon: {
     label: '声光报警器',
@@ -53754,6 +53774,97 @@ const PROP_TYPES = {
         const leg = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.9, 0.06), M.frame);
         leg.position.set(px, 0.45, pz); g.add(leg);
       });
+      return g;
+    },
+  },
+  conveyor: {
+    label: '输送线',
+    make() {
+      const g = new THREE.Group();
+      const belt = new THREE.Mesh(new THREE.BoxGeometry(2.8, 0.04, 0.5), M.agvDark);
+      belt.position.y = 0.6; g.add(belt);
+      [-1.3, 0, 1.3].forEach(px => {
+        [-0.22, 0.22].forEach(pz => {
+          const leg = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.6, 0.06), M.frame);
+          leg.position.set(px, 0.3, pz); g.add(leg);
+        });
+      });
+      [-0.27, 0.27].forEach(pz => {
+        const rail = new THREE.Mesh(new THREE.BoxGeometry(2.8, 0.06, 0.05), M.tray);
+        rail.position.set(0, 0.65, pz); g.add(rail);
+      });
+      const rollerGeo = new THREE.CylinderGeometry(0.032, 0.032, 0.48, 8);
+      for (let k = 0; k < 9; k++) {
+        const rl = new THREE.Mesh(rollerGeo, PROP_EXTRA_MATS.steel);
+        rl.rotation.x = Math.PI / 2;
+        rl.position.set(-1.2 + k * 0.3, 0.655, 0);
+        g.add(rl);
+      }
+      return g;
+    },
+  },
+  bed: {
+    label: '育苗苗床',
+    make() {
+      const g = new THREE.Group();
+      const tray = new THREE.Mesh(new THREE.BoxGeometry(2.2, 0.1, 0.9), M.tray);
+      tray.position.y = 0.7; g.add(tray);
+      const crop = new THREE.Mesh(new THREE.BoxGeometry(2.0, 0.07, 0.72), PROP_EXTRA_MATS.crop);
+      crop.position.y = 0.77; g.add(crop);
+      [[-0.95, -0.35], [0.95, -0.35], [-0.95, 0.35], [0.95, 0.35]].forEach(([px, pz]) => {
+        const leg = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.7, 0.06), M.frame);
+        leg.position.set(px, 0.35, pz); g.add(leg);
+      });
+      return g;
+    },
+  },
+  pack: {
+    label: '分拣包装台',
+    make() {
+      const g = new THREE.Group();
+      const top = new THREE.Mesh(new THREE.BoxGeometry(1.8, 0.06, 0.8), M.tray);
+      top.position.y = 0.88; g.add(top);
+      [[-0.8, -0.32], [0.8, -0.32], [-0.8, 0.32], [0.8, 0.32]].forEach(([px, pz]) => {
+        const leg = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.88, 0.06), M.frame);
+        leg.position.set(px, 0.44, pz); g.add(leg);
+      });
+      [-0.55, -0.18, 0.19].forEach(px => {
+        const box = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.22, 0.3), PROP_EXTRA_MATS.carton);
+        box.position.set(px, 1.02, 0.02); g.add(box);
+      });
+      return g;
+    },
+  },
+  fan: {
+    label: '环流风机',
+    make() {
+      const g = new THREE.Group();
+      const stand = new THREE.Mesh(new THREE.BoxGeometry(0.1, 1.05, 0.1), M.frame);
+      stand.position.y = 0.53; g.add(stand);
+      const base = new THREE.Mesh(new THREE.CylinderGeometry(0.24, 0.24, 0.05, 14), M.agvDark);
+      base.position.y = 0.03; g.add(base);
+      const ring = new THREE.Mesh(new THREE.TorusGeometry(0.33, 0.045, 8, 22), M.agvDark);
+      ring.rotation.y = Math.PI / 2;
+      ring.position.y = 1.2; g.add(ring);
+      const hub = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 0.14, 12), M.agvDark);
+      hub.rotation.z = Math.PI / 2; hub.position.y = 1.2; g.add(hub);
+      [[0.26, 0], [-0.13, 0.22], [-0.13, -0.22]].forEach(([dz, dy]) => {
+        const bl = new THREE.Mesh(new THREE.BoxGeometry(0.035, 0.19, 0.13), M.tray);
+        bl.position.set(0.05, 1.2 + dy, dz); g.add(bl);
+      });
+      return g;
+    },
+  },
+  co2: {
+    label: 'CO₂ 补给',
+    make() {
+      const g = new THREE.Group();
+      const body = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.3, 1.1, 16), PROP_EXTRA_MATS.steel);
+      body.position.y = 0.55; g.add(body);
+      const cap = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 0.14, 12), M.cyanLine);
+      cap.position.y = 1.15; g.add(cap);
+      const pipe = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.05, 0.7), M.agvDark);
+      pipe.position.set(0, 1.2, 0.36); g.add(pipe);
       return g;
     },
   },
@@ -53951,13 +54062,31 @@ function renderPropList() {
   }
   CFG.props.forEach((p, i) => {
     const def = PROP_TYPES[p.type];
+    const deg = Math.round(((p.rot || 0) * 180 / Math.PI) % 360);
     const row = document.createElement('div');
     row.className = 'pl';
-    row.innerHTML = '<b>' + (def ? def.label : p.type) + '　(' + p.x.toFixed(1) + ', ' + p.z.toFixed(1) + ')</b>';
-    const del = document.createElement('span');
-    del.textContent = '删除';
-    del.onclick = () => { CFG.props.splice(i, 1); rebuildProps(); renderPropList(); saveCfg(); };
-    row.appendChild(del);
+    const b = document.createElement('b');
+    b.textContent = (def ? def.label : p.type) + '　(' + p.x.toFixed(1) + ', ' + p.z.toFixed(1) + ') ' + deg + '°';
+    row.appendChild(b);
+
+    const acts = document.createElement('div');
+    acts.className = 'pl-act';
+    const items = [
+      ['旋转', () => { p.rot = (p.rot || 0) + Math.PI / 2; rebuildProps(); renderPropList(); saveCfg(); }],
+      ['复制', () => {
+        CFG.props.push({type: p.type, x: +(p.x + 0.7).toFixed(2), z: +(p.z + 0.25).toFixed(2), rot: p.rot || 0});
+        rebuildProps(); renderPropList(); saveCfg();
+      }],
+      ['删除', () => { CFG.props.splice(i, 1); rebuildProps(); renderPropList(); saveCfg(); }],
+    ];
+    items.forEach(([text, fn], idx) => {
+      const act = document.createElement('i');
+      act.textContent = text;
+      if (idx === 2) act.className = 'rm';
+      act.onclick = fn;
+      acts.appendChild(act);
+    });
+    row.appendChild(acts);
     box.appendChild(row);
   });
 }
@@ -53990,6 +54119,19 @@ function openEditor() {
       wrap.appendChild(b);
     });
   }
+
+  const presetWrap = document.getElementById('em-presets');
+  if (!presetWrap.children.length) {
+    Object.entries(PRESETS).forEach(([k, def]) => {
+      const b = document.createElement('div');
+      b.className = 'chip';
+      b.dataset.preset = k;
+      b.textContent = def.label;
+      b.onclick = () => applyPreset(k);
+      presetWrap.appendChild(b);
+    });
+  }
+
   renderPropList();
   document.getElementById('edit-modal').classList.add('on');
 }
@@ -54011,6 +54153,57 @@ function applyEditor() {
   resetRun();
 }
 
+/* 布局模板：只改阵列参数，已摆放的配件保留 */
+const PRESETS = {
+  standard: {label: '标准苗床线 3×5', cfg: {rows: 3, cols: 5, layers: 4, plants: 16, sensorPerRack: 2}},
+  single:   {label: '小试单排 1×3', cfg: {rows: 1, cols: 3, layers: 3, plants: 12, sensorPerRack: 1}},
+  dense:    {label: '密集育苗 3×6', cfg: {rows: 3, cols: 6, layers: 3, plants: 24, sensorPerRack: 2}},
+};
+
+function applyPreset(key) {
+  const def = PRESETS[key];
+  if (!def) return;
+  Object.assign(CFG, JSON.parse(JSON.stringify(def.cfg)));
+  CFG.alertRow = Math.max(0, Math.min(CFG.alertRow, CFG.rows - 1));
+  CFG.alertCol = Math.max(0, Math.min(CFG.alertCol, CFG.cols - 1));
+  closeEditor();
+  buildWorld();
+  resetRun();
+}
+
+/* 配置导出 / 导入：整份场景（阵列 + 配件）存成 JSON，换机、发给同学都能复现 */
+function exportCfg() {
+  const blob = new Blob([JSON.stringify(CFG, null, 2)], {type: 'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'plant-factory-scene.json';
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1500);
+}
+
+function importCfg(file) {
+  const fr = new FileReader();
+  fr.onload = () => {
+    try {
+      const obj = JSON.parse(String(fr.result));
+      ['rows', 'cols', 'layers', 'plants', 'sensorPerRack', 'ledOn', 'agvCam', 'cabOn', 'fertOn',
+       'alertRow', 'alertCol'].forEach(k => { if (obj[k] !== undefined) CFG[k] = obj[k]; });
+      CFG.rows = Math.max(1, Math.min(3, +CFG.rows || 3));
+      CFG.cols = Math.max(1, Math.min(6, +CFG.cols || 5));
+      CFG.layers = Math.max(2, Math.min(5, +CFG.layers || 4));
+      CFG.props = (Array.isArray(obj.props) ? obj.props : [])
+        .filter(p => p && PROP_TYPES[p.type])
+        .map(p => ({type: p.type, x: +(p.x) || 0, z: +(p.z) || 0, rot: +(p.rot) || 0}));
+      closeEditor();
+      buildWorld();
+      resetRun();
+    } catch (e) {
+      alert('配置文件解析失败：' + e.message);
+    }
+  };
+  fr.readAsText(file, 'utf-8');
+}
+
 /* 配件放置：选中类型后点地面落位 */
 let placing = null;
 
@@ -54019,6 +54212,7 @@ function startPlace(type) {
   const def = PROP_TYPES[type];
   document.getElementById('place-name').textContent = def ? def.label : type;
   document.getElementById('place-hint').style.display = 'block';
+  document.getElementById('scene').classList.add('placing');
   closeEditor();
 }
 
@@ -54035,6 +54229,7 @@ document.getElementById('scene').addEventListener('pointerup', e => {
   CFG.props.push({type: placing, x: +hit.point.x.toFixed(2), z: +hit.point.z.toFixed(2), rot: 0});
   placing = null;
   document.getElementById('place-hint').style.display = 'none';
+  document.getElementById('scene').classList.remove('placing');
   rebuildProps();
   saveCfg();
 });
@@ -54221,6 +54416,13 @@ $('btn-edit').onclick = openEditor;
 $('em-cancel').onclick = closeEditor;
 $('em-x').onclick = closeEditor;
 $('em-apply').onclick = applyEditor;
+$('em-export').onclick = exportCfg;
+$('em-import').onclick = () => $('em-file').click();
+$('em-file').onchange = (e) => {
+  const f = e.target.files && e.target.files[0];
+  if (f) importCfg(f);
+  e.target.value = '';
+};
 $('em-reset').onclick = () => {
   Object.keys(CFG).forEach(k => delete CFG[k]);
   Object.assign(CFG, JSON.parse(JSON.stringify(DEFAULT_CFG)));
@@ -54235,6 +54437,7 @@ window.addEventListener('keydown', e => {
     if (placing) {
       placing = null;
       $('place-hint').style.display = 'none';
+      $('scene').classList.remove('placing');
     } else {
       closeEditor();
     }
@@ -54336,7 +54539,8 @@ resetRun();
 loop();
 
 /* 调试/讲解用入口：控制台可逐步驱动，也可改 CFG 后 rebuild */
-window.__demo = {S, agv, CFG, camera, controls, scene, renderer, buildWorld, rebuildProps, saveCfg, PROP_TYPES, goAlarm, goDispatch, goNavigate, goRecognize, confirmAction};
+window.__demo = {S, agv, CFG, camera, controls, scene, renderer, buildWorld, rebuildProps, saveCfg, PROP_TYPES,
+  PRESETS, applyPreset, exportCfg, importCfg, resetRun, goAlarm, goDispatch, goNavigate, goRecognize, confirmAction};
 
 setTimeout(() => {
   const b = $('boot');

@@ -124,11 +124,16 @@ CFG = {rows, cols, layers, plants, sensorPerRack, ledOn, agvCam, cabOn, fertOn, 
 
 ```js
 PROP_TYPES = {
-  beacon:  {label: '声光报警器', make() {...}},
-  charger: {label: '充电桩',     make() {...}},
-  camera:  {label: '云台摄像头', make() {...}},
-  tank:    {label: '储液罐',     make() {...}},
-  bench:   {label: '操作台',     make() {...}},
+  beacon:   {label: '声光报警器',   make() {...}},
+  charger:  {label: '充电桩',       make() {...}},
+  camera:   {label: '云台摄像头',   make() {...}},
+  tank:     {label: '储液罐',       make() {...}},
+  bench:    {label: '操作台',       make() {...}},
+  conveyor: {label: '输送线',       make() {...}},
+  bed:      {label: '育苗苗床',     make() {...}},
+  pack:     {label: '分拣包装台',   make() {...}},
+  fan:      {label: '环流风机',     make() {...}},
+  co2:      {label: 'CO₂ 补给',     make() {...}},
 }
 ```
 
@@ -136,12 +141,38 @@ PROP_TYPES = {
 编辑面板的按钮由 `Object.entries(PROP_TYPES)` 自动生成，不用改 UI 代码；删配件＝删数组里的一条。
 放置交互是「选中类型 → 点地面 → 射线求交落位」，Esc 取消。
 
-### 10.3 本地运行程序
+列表里的三个操作都只改实例、不碰几何：**旋转**每次 `rot += π/2`，**复制**在 `(x+0.7, z+0.25)`
+处再生成一份（错开而不是重叠，避免看着只有一件），**删除**直接 `splice`。三者收尾都是同一条链路
+`rebuildProps() → renderPropList() → saveCfg()`，保证 3D 场景、列表、持久化三处永远一致——
+工厂函数只管造模型，位置/朝向/数量全部交给实例数据，不让模型自己记状态。
+
+体积上也有取舍：十类配件共用的材质抽到 `PROP_EXTRA_MATS`（叶菜绿、纸箱、金属），
+工厂函数里只新建几何；重建时 `disposeTree` 只 dispose geometry、不销毁材质，
+避免反复摆放后材质对象无限增长。
+
+### 10.3 场景可以存档、可以带走
+
+`导出配置 JSON` 把 `CFG` 整个序列化落地（阵列参数、四个开关、告警点位、配件实例），
+`导入配置 JSON` 反过来读：字段按白名单逐个校验，行列层夹到 1–3 / 1–6 / 2–5，
+配件按 `PROP_TYPES` 白名单过滤，未知类型与非法坐标一律丢弃。写坏的文件不会把场景搞崩，
+只会少几个配件——**导入是「容错重放」，不是「照单全收」**。
+
+配套三个布局模板（标准苗床线 3×5 / 小试单排 1×3 / 密集育苗 3×6）只覆盖阵列参数，不动配件：
+换产线形态时，桌台上已经摆好的设备没必要跟着消失。
+
+### 10.4 本地运行程序
 
 在线版是 GitHub Pages；离线交付用一个 zip：`index.html` ＋ `启动演示.bat` ＋ `使用说明.txt`。
-`index.html` 已把 three.js 内嵌成 `globalThis.__THREE`，页面零外部请求，所以 bat 只是
-`start "" "%~dp0index.html"`，不依赖 Node、不依赖本地服务器。
+`index.html` 已把 three.js 内嵌成 `globalThis.__THREE`，页面零外部请求，所以本地端不需要 Node、
+也不需要本地服务器，bat 只做两件事：
+
+1. 有 Edge 就 `start msedge --app="file:///…/index.html" --window-size=1600,900`，
+   以应用窗口打开、没有标签栏与地址栏，看起来就是个独立程序；
+2. 没有 Edge 就退回 `start "" index.html`，交给系统默认浏览器。
+
+bat 用 UTF-8 存、首行 `chcp 65001`，换行是 CRLF——cmd 按行解析，
+LF 换行在部分系统上会把括号块读错，这类细节不值得在演示当天踩。
 
 没有做成独立 exe（Electron / PyInstaller）：一是体积与启动时间都远大于一个 1.3 MB 的单文件页面，
 二是这类演示的信任成本在于「能双击打开」，打包成 exe 反而会被杀软拦、被怀疑。
-zip ＋ 系统浏览器是这里阻力最小的路径。
+zip ＋ 系统浏览器 ＋ 应用窗口是这里阻力最小的路径。
