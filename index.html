@@ -4,6 +4,8 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>数智植物工厂 · 固定＋移动协同巡检</title>
+<meta name="description" content="可操作的三维巡检演示：固定监测告警、派单、导航、到点拍照、记录生成、人工确认，六步能自己点完。底栏两块面板：官方资料给证据，汇报材料给模式与实测。" />
+<meta name="theme-color" content="#05080f" />
 <link rel="icon" href="data:," />
 <style>
   :root{
@@ -299,6 +301,10 @@
   .btn{transition:color .18s ease,border-color .18s ease,background .18s ease,box-shadow .18s ease;}
   .btn:hover{color:#dff3ff;border-color:rgba(63,182,232,.75);background:rgba(63,182,232,.10);
     box-shadow:0 0 10px rgba(63,182,232,.14);}
+  /* 键盘可达：Tab 走到哪，哪一圈亮起来 */
+  .btn:focus-visible,#ref-close:focus-visible,#rep-x:focus-visible,#rep-talk:focus-visible,
+  .rep-tabs button:focus-visible,.step-item:focus-visible,#ppt-pager a:focus-visible{
+    outline:2px solid var(--cyan);outline-offset:2px;}
   .repmeta{margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,.08);
     font-size:10px;color:rgba(255,255,255,.46);letter-spacing:.4px;font-variant-numeric:tabular-nums;}
   #rep-card{animation:repIn .18s cubic-bezier(.2,.8,.2,1) both;}
@@ -477,7 +483,7 @@
 
     <div class="rfoot">
       <small>链接若在校内网络打不开，用手机热点或直接照着域名手动访问。</small>
-      <div class="btn" id="ref-close">关闭</div>
+      <div class="btn" id="ref-close" role="button" tabindex="0" aria-label="关闭官方资料面板">关闭</div>
     </div>
   </div>
 </div>
@@ -493,7 +499,7 @@
         <button data-tab="effect">03 效果</button>
       </div>
       <div id="rep-talk">演讲模式</div>
-      <span id="rep-x">关闭</span>
+      <span id="rep-x" role="button" tabindex="0" aria-label="关闭汇报材料面板">关闭</span>
     </div>
 
     <div class="rep-pane on" id="pane-mode">
