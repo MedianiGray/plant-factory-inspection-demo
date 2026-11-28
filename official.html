@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>数智植物工厂 · 固定监测 ＋ 移动复核 智能巡检</title>
+<meta name="description" content="高架叶菜植物工厂的巡检方案：固定监测打底，一台移动车补上到点确认这一环。在线演示可直接操作。"/>
+<style>
+  :root{
+    --bg:#05080f; --bg2:#080e1a; --panel:#0a1322; --line:rgba(70,120,180,.26);
+    --line2:rgba(70,120,180,.14); --ink:#e8eef5; --ink2:#a9c2d8; --dim:#5f7b95;
+    --cyan:#3fb6e8; --amber:#e4c07a; --ok:#4fd39a;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;background:var(--bg);color:var(--ink);
+    font-family:"Microsoft YaHei","PingFang SC","Segoe UI",sans-serif;
+    -webkit-font-smoothing:antialiased;
+        background-image:
+      linear-gradient(rgba(70,120,180,.045) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(70,120,180,.045) 1px,transparent 1px);
+    background-size:48px 48px;
+  }
+  a{color:inherit;text-decoration:none;}
+  .wrap{max-width:1240px;margin:0 auto;padding:0 28px;}
+  .mono{font-family:Consolas,"SFMono-Regular",monospace;}
+  .kicker{font-size:10.5px;letter-spacing:3px;color:var(--cyan);}
+  h1,h2,h3{margin:0;letter-spacing:.5px;}
+  p{margin:0;}
+
+  /* 顶部导航 */
+  header{position:sticky;top:0;z-index:40;backdrop-filter:blur(10px);
+    background:linear-gradient(180deg,rgba(5,8,15,.94),rgba(5,8,15,.78));border-bottom:1px solid var(--line2);}
+  .nav{display:flex;align-items:center;gap:26px;height:64px;}
+  .brand{display:flex;align-items:center;gap:11px;}
+  .mark{width:26px;height:26px;border:1px solid var(--cyan);position:relative;flex:0 0 auto;}
+  .mark::before{content:'';position:absolute;left:5px;top:5px;right:5px;bottom:5px;border:1px solid rgba(63,182,232,.45);}
+  .mark::after{content:'';position:absolute;left:50%;top:50%;width:4px;height:4px;background:var(--cyan);transform:translate(-50%,-50%);}
+  .brand b{font-size:14px;font-weight:600;letter-spacing:2px;}
+  .brand i{font-style:normal;font-size:9px;letter-spacing:2px;color:var(--dim);display:block;margin-top:2px;}
+  .nav nav{display:flex;gap:22px;margin-left:24px;}
+  .nav nav a{font-size:11.5px;letter-spacing:1px;color:var(--ink2);padding:6px 0;border-bottom:1px solid transparent;}
+  .nav nav a:hover{color:#fff;border-bottom-color:var(--cyan);}
+  .nav .cta{margin-left:auto;display:flex;align-items:center;gap:10px;}
+  .btn{display:inline-flex;align-items:center;gap:7px;font-size:11.5px;letter-spacing:1px;
+    padding:9px 16px;border:1px solid var(--line);color:var(--ink2);cursor:pointer;background:none;
+    transition:color .18s,border-color .18s,background .18s;}
+  .btn:hover{color:#fff;border-color:var(--cyan);background:rgba(63,182,232,.08);}
+  .btn.primary{border-color:var(--cyan);color:#eaf7ff;background:rgba(63,182,232,.14);}
+  .btn.primary:hover{background:rgba(63,182,232,.24);}
+  .live{display:flex;align-items:center;gap:6px;font-size:10px;color:var(--dim);letter-spacing:1px;}
+  .live s{width:5px;height:5px;background:var(--ok);border-radius:50%;box-shadow:0 0 8px var(--ok);text-decoration:none;}
+
+  /* Hero */
+  .hero{padding:72px 0 56px;border-bottom:1px solid var(--line2);}
+  .hero .grid{display:grid;grid-template-columns:1.06fr .94fr;gap:52px;align-items:center;}
+  .hero h1{font-size:clamp(30px,4.1vw,52px);line-height:1.24;font-weight:600;margin:16px 0 0;}
+  .hero h1 em{font-style:normal;color:var(--cyan);}
+  .hero .lead{margin-top:20px;font-size:14px;line-height:2;color:var(--ink2);max-width:560px;}
+  .hero .acts{margin-top:28px;display:flex;gap:12px;flex-wrap:wrap;}
+  .hero .note{margin-top:16px;font-size:10.5px;color:var(--dim);letter-spacing:.5px;}
+  .shot-frame{position:relative;border:1px solid var(--line);background:var(--panel);padding:8px;}
+  .shot-frame img{display:block;width:100%;height:auto;}
+  .shot-frame span{position:absolute;left:8px;bottom:10px;font-size:9.5px;letter-spacing:1px;color:#cfe0f2;
+    background:rgba(5,8,15,.78);border:1px solid var(--line);padding:4px 8px;}
+
+  /* 数字条 */
+  .stats{border-bottom:1px solid var(--line2);}
+  .stats .row{display:grid;grid-template-columns:repeat(4,1fr);}
+  .stats .cell{padding:22px 0;border-left:1px solid var(--line2);}
+  .stats .cell:first-child{border-left:none;padding-left:0;}
+  .stats b{display:block;font-size:26px;font-weight:600;letter-spacing:1px;}
+  .stats b i{font-style:normal;font-size:12px;color:var(--dim);margin-left:6px;letter-spacing:1px;}
+  .stats p{margin-top:6px;font-size:10.5px;color:var(--dim);letter-spacing:1px;}
+
+  section{padding:64px 0;border-bottom:1px solid var(--line2);}
+  .sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:26px;}
+  .sec-no{font-size:10.5px;letter-spacing:2px;color:var(--dim);}
+  .sec-head h2{font-size:22px;font-weight:600;letter-spacing:1px;}
+  .sec-head .hint{margin-left:auto;font-size:10.5px;color:var(--dim);letter-spacing:1px;}
+
+  /* 三个盲区 */
+  .gap-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line2);border:1px solid var(--line2);}
+  .gap-card{background:var(--bg2);padding:22px 20px 24px;}
+  .gap-card .tag{font-size:9.5px;letter-spacing:2px;color:var(--amber);}
+  .gap-card b{display:block;margin:10px 0 8px;font-size:15px;}
+  .gap-card p{font-size:12px;line-height:1.95;color:var(--ink2);}
+  .gap-foot{margin-top:18px;font-size:12.5px;line-height:1.9;color:#cfe0f2;border-left:2px solid var(--cyan);padding-left:14px;}
+
+  /* 演示嵌入 */
+  #demo{padding-bottom:56px;}
+  .demo-head{display:flex;align-items:flex-end;gap:20px;flex-wrap:wrap;margin-bottom:18px;}
+  .demo-head .txt{max-width:640px;}
+  .demo-head h2{font-size:22px;font-weight:600;}
+  .demo-head p{margin-top:10px;font-size:12px;line-height:1.95;color:var(--ink2);}
+  .demo-tools{margin-left:auto;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+  .demo-state{display:flex;align-items:center;gap:7px;font-size:10px;letter-spacing:1px;color:var(--dim);}
+  .demo-state s{width:6px;height:6px;border-radius:50%;background:var(--amber);text-decoration:none;transition:background .2s,box-shadow .2s;}
+  .demo-state.ready s{background:var(--ok);box-shadow:0 0 8px var(--ok);}
+  .demo-state.ready{color:#bcd6c9;}
+  .stage{position:relative;border:1px solid var(--line);background:#03060c;padding:6px;}
+  .stage .peek{display:flex;align-items:center;gap:8px;padding:2px 6px 8px;font-size:9.5px;letter-spacing:1px;color:var(--dim);}
+  .stage .peek i{font-style:normal;color:#7f97b0;}
+  .embed{position:relative;width:100%;aspect-ratio:16/9;background:#05080f;overflow:hidden;}
+  .embed iframe{position:absolute;inset:0;width:100%;height:100%;border:0;display:block;}
+  .embed .fallback{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:14px;
+    text-align:center;padding:24px;background:radial-gradient(120% 120% at 50% 0%,#0b1526,#05080f 70%);}
+  .embed.failed .fallback{display:flex;}
+  .embed .fallback b{font-size:15px;letter-spacing:1px;}
+  .embed .fallback p{font-size:11.5px;line-height:1.9;color:var(--ink2);max-width:520px;}
+  .stage-foot{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;align-items:center;margin-top:12px;}
+  .stage-foot small{font-size:10px;color:var(--dim);line-height:1.8;}
+  .stage-foot .links{display:flex;gap:10px;flex-wrap:wrap;}
+
+  /* 六步 */
+  .steps{display:grid;grid-template-columns:repeat(6,1fr);gap:1px;background:var(--line2);border:1px solid var(--line2);}
+  .step{background:var(--bg2);padding:16px 14px 18px;}
+  .step em{font-style:normal;font-size:9.5px;letter-spacing:1px;color:var(--cyan);font-family:Consolas,monospace;}
+  .step b{display:block;margin:8px 0 6px;font-size:13px;}
+  .step p{font-size:10.5px;line-height:1.8;color:var(--dim);}
+
+  /* 五层 */
+  .arch{display:grid;grid-template-columns:180px 1fr;gap:1px;background:var(--line2);border:1px solid var(--line2);}
+  .arch .k{background:var(--panel);padding:16px 18px;font-size:12px;color:#cfe0f2;letter-spacing:1px;}
+  .arch .k i{display:block;font-style:normal;font-size:9.5px;color:var(--dim);margin-top:4px;letter-spacing:1px;}
+  .arch .v{background:var(--bg2);padding:14px 18px;font-size:11.5px;line-height:1.9;color:var(--ink2);}
+
+  /* 资料 */
+  .res-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(228px,1fr));gap:14px;}
+  .res{border:1px solid var(--line);padding:18px 18px 20px;background:linear-gradient(180deg,rgba(63,182,232,.05),transparent 60%);}
+  .res b{display:block;font-size:13px;margin-bottom:6px;}
+  .res i{font-style:normal;font-size:9.5px;letter-spacing:1px;color:var(--dim);display:block;margin-bottom:10px;font-family:Consolas,monospace;}
+  .res p{font-size:11.5px;line-height:1.9;color:var(--ink2);}
+  .res .go{margin-top:12px;display:inline-flex;gap:6px;font-size:10.5px;color:var(--cyan);letter-spacing:1px;}
+  .res .go:hover{color:#fff;}
+  .refs{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-top:22px;}
+  .ref{border:1px solid var(--line2);padding:12px 13px;font-size:11px;color:var(--ink2);transition:border-color .18s,color .18s,background .18s;}
+  .ref:hover{border-color:var(--cyan);color:#fff;background:rgba(63,182,232,.07);}
+  .ref b{display:block;font-size:11.5px;color:#dfeaf5;margin-bottom:4px;}
+  .ref span{font-size:9.5px;color:var(--dim);}
+
+  /* 边界 */
+  .bound{display:grid;grid-template-columns:1fr 1fr;gap:26px;}
+  .bound .box{border:1px solid var(--line2);padding:18px 20px;}
+  .bound b{font-size:12.5px;letter-spacing:1px;display:block;margin-bottom:10px;}
+  .bound ul{margin:0;padding-left:16px;}
+  .bound li{font-size:11.5px;line-height:2;color:var(--ink2);}
+
+  footer{padding:40px 0 54px;background:var(--bg);}
+  .foot{display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap;align-items:flex-end;}
+  .foot .l b{font-size:12.5px;letter-spacing:1px;}
+  .foot .l p{margin-top:8px;font-size:10.5px;line-height:1.9;color:var(--dim);}
+  .foot .r{font-size:10px;color:var(--dim);line-height:1.9;text-align:right;}
+  .foot .r span{color:#7f97b0;}
+
+  .reveal{opacity:0;transform:translateY(14px);transition:opacity .6s ease,transform .6s ease;}
+  .reveal.on{opacity:1;transform:none;}
+
+  @media (max-width:1000px){
+    .hero .grid{grid-template-columns:1fr;gap:30px;}
+    .stats .row{grid-template-columns:repeat(2,1fr);}
+    .stats .cell:nth-child(odd){padding-left:0;border-left:none;}
+    .gap-grid{grid-template-columns:1fr;}
+    .steps{grid-template-columns:repeat(3,1fr);}
+    .res-grid{grid-template-columns:1fr;}
+    .refs{grid-template-columns:repeat(2,1fr);}
+    .bound{grid-template-columns:1fr;}
+    .arch{grid-template-columns:1fr;}
+    .arch .k{border-bottom:1px solid var(--line2);}
+  }
+  @media (max-width:680px){
+    .wrap{padding:0 18px;}
+    .nav nav{display:none;}
+    .hero{padding:44px 0 40px;}
+    .steps{grid-template-columns:repeat(2,1fr);}
+    .refs{grid-template-columns:1fr;}
+    section{padding:44px 0;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap nav">
+    <a class="brand" href="#top">
+      <div class="mark"></div>
+      <div>
+        <b>数智植物工厂</b>
+        <i>固定监测 ＋ 移动复核</i>
+      </div>
+    </a>
+    <nav>
+      <a href="#gaps">方案</a>
+      <a href="#demo">在线演示</a>
+      <a href="#flow">巡检流程</a>
+      <a href="#arch">技术底座</a>
+      <a href="#res">资料与出处</a>
+      <a href="slides.html" target="_blank" rel="noopener">PPT</a>
+    </nav>
+    <div class="cta">
+      <div class="live"><s></s><span id="nav-clock" class="mono">--:--:--</span></div>
+      <a class="btn primary" href="index.html" target="_blank" rel="noopener">打开展示页 ↗</a>
+    </div>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero">
+    <div class="wrap grid">
+      <div>
+        <div class="kicker">高架叶菜植物工厂 · 智能巡检方案</div>
+        <h1>固定监测打底，<br/>一台移动车补上<em>到点确认</em>这一环。</h1>
+        <p class="lead">传感器守点位，但守不住层间和层内远端；告警只给「数值异常」，仍要人走到架位前看一眼。方案把这一眼交给巡检车：固定端持续盯着，移动端按派单到点、拍照、出记录，处置仍然由人定。</p>
+        <div class="acts">
+          <a class="btn primary" href="#demo">进入在线演示</a>
+          <a class="btn" href="slides.html" target="_blank" rel="noopener">网页版 PPT ↗</a>
+          <a class="btn" href="download/plant-factory-demo-1.6.0.zip">下载本地包</a>
+          <a class="btn" href="index.html" target="_blank" rel="noopener">新窗口打开演示页 ↗</a>
+        </div>
+        <p class="note">本地包解压双击「启动演示.bat」，断网也能跑；页面与本地包是同一份东西。</p>
+      </div>
+      <div class="shot-frame reveal">
+        <img src="screenshots/01-overview.png" alt="展示页全景：三层架体、固定监测点位与巡检车"/>
+        <span>展示页全景 · 1600×900 实际截图</span>
+      </div>
+    </div>
+  </section>
+
+  <div class="stats">
+    <div class="wrap row">
+      <div class="cell"><b>15<i>个</i></b><p>固定监测点位（3 行 5 列）</p></div>
+      <div class="cell"><b>1<i>台</i></b><p>移动巡检车，共享给全部点位</p></div>
+      <div class="cell"><b>6<i>步</i></b><p>从告警到人工确认的闭环</p></div>
+      <div class="cell"><b>0<i>项</i></b><p>外部依赖：渲染库整段内嵌</p></div>
+    </div>
+  </div>
+
+  <section id="gaps">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="sec-no">01</span>
+        <h2>固定侧补不上的三个缺口</h2>
+        <span class="hint">这不是替代固定监测，而是补它补不到的那一段</span>
+      </div>
+      <div class="gap-grid reveal">
+        <div class="gap-card">
+          <div class="tag">POINT</div>
+          <b>点位盲区</b>
+          <p>传感器按点位安装，多层架体之间、层内远端都覆盖不到。环境数据代表的是「棚里的均值」，代表不了这一株、这一层。</p>
+        </div>
+        <div class="gap-card">
+          <div class="tag">CONFIRM</div>
+          <b>确认盲区</b>
+          <p>阈值告警只给「数值异常」，误报、设备故障、真实异常混在一起；告警之后仍然要人走到架位前用肉眼确认。</p>
+        </div>
+        <div class="gap-card">
+          <div class="tag">TIME</div>
+          <b>时间盲区</b>
+          <p>人工巡检一天次数有限，夜间与无人时段发现滞后；固定摄像头视角不能移动，没法对可疑植株近距离特写。</p>
+        </div>
+      </div>
+      <p class="gap-foot">一台移动车共享给全部固定点位，比每个架位加装一套固定摄像头成本低得多——这是这套方案的核心取舍。场景从 3 个架位扩到 15 个之后，固定端加了 12 个点位，移动端还是那一台车。</p>
+    </div>
+  </section>
+
+  <section id="demo">
+    <div class="wrap">
+      <div class="demo-head">
+        <div class="txt">
+          <div class="sec-no">02 · 在线演示</div>
+          <h2>这一页里直接跑，不用跳走</h2>
+          <p>下面这块就是展示页本体：固定告警、派单、导航、到点拍照、记录生成、人工确认，六步都能自己点。鼠标左键拖拽旋转，滚轮缩放，右键平移；「编辑场景」可改行列层与配件。</p>
+        </div>
+        <div class="demo-tools">
+          <div class="demo-state" id="demo-state"><s></s><span id="demo-state-txt">正在载入演示</span></div>
+          <button class="btn" id="btn-full">全屏演示</button>
+          <button class="btn" id="btn-reload">重新载入</button>
+        </div>
+      </div>
+
+      <div class="stage reveal">
+        <div class="peek"><i>PREVIEW</i><span>index.html · 与本仓库同一份页面</span></div>
+        <div class="embed" id="embed">
+          <iframe id="frame" src="index.html" title="数智植物工厂巡检展示页" loading="eager" allowfullscreen></iframe>
+          <div class="fallback">
+            <b>这块没能载入演示页</b>
+            <p>有些浏览器或内网策略会拦内嵌页面。点下面的按钮新窗口打开，内容完全一样。</p>
+            <a class="btn primary" href="index.html" target="_blank" rel="noopener">新窗口打开演示页 ↗</a>
+          </div>
+        </div>
+      </div>
+      <div class="stage-foot">
+        <small>演示页里的温湿度、PAR、CO₂、EC、覆盖度、置信度都是模拟值，用来呈现任务怎么流转、人机怎么分工；真实点位与阈值以实训室平台为准。</small>
+        <div class="links">
+          <a class="btn" href="index.html" target="_blank" rel="noopener">独立窗口 ↗</a>
+          <a class="btn" href="download/plant-factory-demo-1.6.0.zip">下载本地包</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="flow">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="sec-no">03</span>
+        <h2>一次巡检，六步走完</h2>
+        <span class="hint">机器做前五步，第六步留给人</span>
+      </div>
+      <div class="steps reveal">
+        <div class="step"><em>01</em><b>固定告警</b><p>某架位 EC 掉到 1.42，低于下限 1.6，点位变红并闪烁。</p></div>
+        <div class="step"><em>02</em><b>智能派单</b><p>生成任务卡：任务号、目标点位、要执行的动作。</p></div>
+        <div class="step"><em>03</em><b>导航出动</b><p>沿走道到目标列前，再前进到架位正面的停车位。</p></div>
+        <div class="step"><em>04</em><b>到点拍照</b><p>停车、车头朝架位，画面闪一下，模拟车载近景识别。</p></div>
+        <div class="step"><em>05</em><b>记录生成</b><p>逐行给出触发、复核、判定、置信度、状态的结构化记录。</p></div>
+        <div class="step"><em>06</em><b>人工确认</b><p>由值班人员点确认并处置；置信度不足一律转人工。</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="arch">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="sec-no">04</span>
+        <h2>五层架构，哪里是新增的</h2>
+        <span class="hint">平台层沿用实训室已有能力，新增集中在智能体层</span>
+      </div>
+      <div class="arch reveal">
+        <div class="k">设备层<i>固定传感器 / 摄像头 · PLC · myAGV</i></div>
+        <div class="v">固定端持续采集环境量与图像；移动车负责走位、停稳、近景拍摄。</div>
+        <div class="k">通信层<i>MQTT / Modbus · ROS2 DDS · 分布式软总线</i></div>
+        <div class="v">环境数据走 MQTT，车体与调度走 ROS2，设备侧接入走分布式软总线。</div>
+        <div class="k">平台层<i>物模型 · 场景联动 · 阈值告警 · 设备日志</i></div>
+        <div class="v">实训室已有，不重复造：告警规则、设备台账、日志都从这里出。</div>
+        <div class="k">智能体层<i>任务派发 · 记录生成（本方案新增）</i></div>
+        <div class="v">把告警翻译成任务、把识别结果写成记录草稿；<b>明确不让它直接控制设备</b>。</div>
+        <div class="k">应用层<i>巡检看板 · 任务管理 · 记录确认</i></div>
+        <div class="v">展现在线和本地两个入口，值班人员在这里确认处置、校准判定口径。</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="res">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="sec-no">05</span>
+        <h2>几个载体，一份内容</h2>
+        <span class="hint">课堂用在线页，断网用本地包，讲复用用网页版 PPT</span>
+      </div>
+      <div class="res-grid reveal">
+        <div class="res">
+          <b>在线展示页</b>
+          <i>index.html · Pages</i>
+          <p>可操作的三维场景，底栏两块面板：官方资料给证据，汇报材料给模式、PPT 与实测截图。</p>
+          <a class="go" href="index.html" target="_blank" rel="noopener">打开 ↗</a>
+        </div>
+        <div class="res">
+          <b>本地演示包</b>
+          <i>plant-factory-demo-1.6.0.zip</i>
+          <p>解压双击「启动演示.bat」，用应用窗口打开；换台电脑、拔网线都照常跑。</p>
+          <a class="go" href="download/plant-factory-demo-1.6.0.zip">下载 ↓</a>
+        </div>
+        <div class="res">
+          <b>网页版 PPT</b>
+          <i>slides.html · 9 页</i>
+          <p>不需要飞书：浏览器里直接投屏翻页，← → 翻页、F 全屏、N 看讲稿；要改字另有飞书版备份。</p>
+          <a class="go" href="slides.html" target="_blank" rel="noopener">打开 ↗</a>
+        </div>
+        <div class="res">
+          <b>官网页本身</b>
+          <i>official.html · 本页</i>
+          <p>门面 + 在线演示 + 流程 + 架构 + 资料与边界；演示以 16:9 框内嵌，被拦时自动给新窗口兜底。</p>
+          <a class="go" href="#demo">看演示 ↓</a>
+        </div>
+      </div>
+
+      <div class="sec-head" style="margin-top:44px;margin-bottom:0">
+        <span class="sec-no">参考</span>
+        <h2 style="font-size:15px">老师给的五个入口，现场都能点开</h2>
+      </div>
+      <div class="refs reveal">
+        <a class="ref" href="https://www.elephantrobotics.com/" target="_blank" rel="noopener"><b>大象机器人</b><span>产品形态与参数</span></a>
+        <a class="ref" href="https://www.openharmony.cn/HomePage" target="_blank" rel="noopener"><b>OpenHarmony</b><span>设备侧底座</span></a>
+        <a class="ref" href="https://www.kaihong.com/" target="_blank" rel="noopener"><b>开鸿 Kaihong</b><span>国产化行业落地</span></a>
+        <a class="ref" href="https://weixin.qq.com/sph/AFZkQOiIxC" target="_blank" rel="noopener"><b>视频号演示（一）</b><span>真机实际运行</span></a>
+        <a class="ref" href="https://weixin.qq.com/sph/AwV9cIu9L6" target="_blank" rel="noopener"><b>视频号演示（二）</b><span>真机实际运行</span></a>
+      </div>
+    </div>
+  </section>
+
+  <section id="bound">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="sec-no">06</span>
+        <h2>边界与下一步</h2>
+        <span class="hint">说清楚哪些是真的，哪些还是模拟</span>
+      </div>
+      <div class="bound reveal">
+        <div class="box">
+          <b>现在是真的</b>
+          <ul>
+            <li>页面能跑、能操作，断网也能开</li>
+            <li>场景参数化：行列层、株数、节点、配件、告警点位可改</li>
+            <li>场景配置能导出 JSON，换机器复现同一场景</li>
+            <li>两块面板与九页 PPT 说同一套动作</li>
+          </ul>
+        </div>
+        <div class="box">
+          <b>现在仍是模拟</b>
+          <ul>
+            <li>温湿度、PAR、CO₂、EC、覆盖度、置信度为模拟值</li>
+            <li>识别结果是示意，不是实训室实测</li>
+            <li>本页不是 Gazebo 仿真：仿真验证走 ROS2 + Gazebo</li>
+            <li>导航失败接管、阈值校准仍是人工流程</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="wrap foot">
+      <div class="l">
+        <b>数智植物工厂 · 固定监测 ＋ 移动复核 智能巡检</b>
+        <p>广西农业职业技术大学 信息工程学院 · 网络工程技术（本）2502 · 覃祖悦<br/>
+           课程汇报材料，2026 年 11 月；页面、下载包、PPT 三处同源。</p>
+      </div>
+      <div class="r">
+        <span id="foot-ver">站点版本 v1.6.0</span><br/>
+        静态页由 GitHub Pages 发布 · 不依赖外部 CDN<br/>
+        更新 <span id="foot-date">2026-11-28</span>
+      </div>
+    </div>
+  </footer>
+</main>
+
+<script>
+(function () {
+  const pad = (n) => String(n).padStart(2, '0');
+  const clockEl = document.getElementById('nav-clock');
+  const tick = () => {
+    const d = new Date();
+    clockEl.textContent = pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds());
+  };
+  tick();
+  setInterval(tick, 1000);
+
+  /* 内嵌演示：载入完成标记、全屏、重载、失败兜底 */
+  const frame = document.getElementById('frame');
+  const embed = document.getElementById('embed');
+  const state = document.getElementById('demo-state');
+  const stateTxt = document.getElementById('demo-state-txt');
+  let timer = null;
+
+  const markReady = () => {
+    state.classList.add('ready');
+    stateTxt.textContent = '演示已载入 · 可直接操作';
+    if (timer) { clearTimeout(timer); timer = null; }
+  };
+  const markFail = () => {
+    embed.classList.add('failed');
+    stateTxt.textContent = '内嵌被拦，请新窗口打开';
+  };
+
+  frame.addEventListener('load', () => {
+    try {
+      const doc = frame.contentDocument;
+      if (!doc || !doc.querySelector('#btn-start')) { markFail(); return; }
+      markReady();
+    } catch (e) { markReady(); }
+  });
+  timer = setTimeout(() => {
+    if (!state.classList.contains('ready')) stateTxt.textContent = '载入较慢 · 可点「重新载入」';
+  }, 12000);
+
+  document.getElementById('btn-reload').onclick = () => {
+    embed.classList.remove('failed');
+    state.classList.remove('ready');
+    stateTxt.textContent = '正在重新载入';
+    frame.src = location.protocol === 'file:' ? 'index.html' : ('index.html?t=' + Date.now());
+  };
+
+  document.getElementById('btn-full').onclick = () => {
+    const stage = document.getElementById('embed');
+    if (stage.requestFullscreen) stage.requestFullscreen();
+    else if (stage.webkitRequestFullscreen) stage.webkitRequestFullscreen();
+  };
+
+  /* 进场：轻，只做透明度与位移 */
+  const items = document.querySelectorAll('.reveal');
+  if ('IntersectionObserver' in window) {
+    const io = new IntersectionObserver((es) => {
+      es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('on'); io.unobserve(e.target); } });
+    }, { rootMargin: '0px 0px -12% 0px', threshold: 0.12 });
+    items.forEach((i) => io.observe(i));
+  } else items.forEach((i) => i.classList.add('on'));
+
+  /* 导航锚点：滚到区块时高亮 */
+  const links = [...document.querySelectorAll('.nav nav a')];
+  const secs = links.map((a) => document.querySelector(a.getAttribute('href'))).filter(Boolean);
+  const onScroll = () => {
+    const y = window.scrollY + 120;
+    let idx = -1;
+    secs.forEach((s, i) => { if (s.offsetTop <= y) idx = i; });
+    links.forEach((a, i) => { a.style.color = i === idx ? '#ffffff' : ''; a.style.borderBottomColor = i === idx ? 'var(--cyan)' : ''; });
+  };
+    window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+})();
+</script>
+</body>
+</html>
