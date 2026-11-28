@@ -63,7 +63,7 @@
 
   /* ── 首屏：一件事，一句主张 ── */
   .hero{padding:96px 0 72px;}
-  .hero .grid{display:grid;grid-template-columns:1.06fr .94fr;gap:80px;align-items:center;}
+  .hero .grid{display:grid;grid-template-columns:1.06fr .94fr;gap:80px;align-items:start;}
   .eyebrow{font-size:10px;letter-spacing:2.8px;color:var(--accent);font-family:Consolas,monospace;}
   .hero h1{margin-top:22px;font-size:clamp(34px,3.8vw,52px);line-height:1.22;letter-spacing:.6px;}
   .hero .lead{margin-top:26px;font-size:15.5px;line-height:2;color:var(--ink2);max-width:520px;}
@@ -72,31 +72,7 @@
   .hero .meta b{color:var(--ink);font-size:12px;margin-right:5px;}
 
   /* ── 点位图：全站唯一的图形语言（点阵 + 扫描线） ── */
-  .diagram{margin:0;border:1px solid var(--line);border-radius:var(--r-stage);padding:22px 22px 18px;
-    background:#fff;box-shadow:var(--sh-stage);}
-  .diagram .bar{display:flex;justify-content:space-between;align-items:center;
-    font-size:9.5px;letter-spacing:1.6px;color:var(--dim);padding-bottom:14px;border-bottom:1px solid var(--line2);}
-  .diagram .bar s{width:5px;height:5px;border-radius:50%;background:var(--ok);text-decoration:none;margin-right:6px;}
-  .plot{position:relative;margin:16px 0 4px;aspect-ratio:16/11.6;
-    background-image:radial-gradient(circle at 1px 1px,rgba(18,87,216,.14) 1px,transparent 1px);
-    background-size:18px 18px;}
-  .cells{position:absolute;inset:0;display:grid;grid-template-columns:repeat(5,1fr);grid-template-rows:repeat(3,1fr);gap:8px;}
-  .cells i{position:relative;border:1px solid var(--line);background:rgba(255,255,255,.86);}
-  .cells i em{position:absolute;left:4px;top:3px;font-style:normal;font-size:8px;color:var(--dim);
-    font-family:Consolas,monospace;letter-spacing:.4px;}
-  .cells i.hit{border-color:#d9a967;background:#fdf6ea;}
-  .cells i.hit em{color:var(--amber);}
-  .cells i.hit::after{content:'';position:absolute;right:4px;top:4px;width:4px;height:4px;background:var(--amber);}
-  .paths{position:absolute;inset:0;width:100%;height:100%;}
-  .scan{position:absolute;left:0;right:0;height:1px;top:0;
-    background:linear-gradient(90deg,transparent,rgba(18,87,216,.55),transparent);
-    animation:scan 5.5s cubic-bezier(.4,0,.2,1) infinite;}
-  @keyframes scan{0%{top:2%;opacity:0}12%{opacity:1}88%{opacity:1}100%{top:96%;opacity:0}}
-  @media (prefers-reduced-motion:reduce){.scan{animation:none;opacity:0;}}
-  .car{position:absolute;left:6%;bottom:6%;width:42px;height:24px;border:1px solid var(--accent);background:var(--accent-soft);
-    display:flex;align-items:center;justify-content:center;font-size:7.5px;color:var(--accent);letter-spacing:.4px;}
-  .diagram figcaption{margin-top:16px;font-size:10.5px;line-height:1.85;color:var(--dim);}
-  .diagram figcaption b{color:var(--ink2);font-weight:400;}
+
 
   /* ── 数字带：一行，白底，细线分隔 ── */
   .band{border-top:1px solid var(--line);border-bottom:1px solid var(--line);}
@@ -109,9 +85,9 @@
 
   /* ── 通用节：一条横线 + 一条编号，标题只在一处 ── */
   .sec{padding:92px 0;border-bottom:1px solid var(--line2);}
-  .sec-head{display:flex;align-items:baseline;gap:20px;padding-top:20px;border-top:1px solid var(--ink);
+  .sec-head{display:block;padding-top:22px;border-top:1px solid var(--ink);
     margin-bottom:40px;}
-  .sec-no{font-size:10px;letter-spacing:1.8px;color:var(--dim);font-family:Consolas,monospace;}
+  .sec-no{display:block;font-size:10px;letter-spacing:1.8px;color:var(--dim);font-family:Consolas,monospace;margin-bottom:9px;}
   .sec-head h2{font-size:27px;line-height:1.4;letter-spacing:.6px;}
   .sec-head .hint{display:none;}      /* 注释性小字一律不上页，克制 */
   .lede{font-size:15px;line-height:1.95;color:var(--ink2);max-width:760px;}
@@ -189,14 +165,14 @@
   .res,.moves{display:grid;gap:var(--s2);}
   .res{grid-template-columns:repeat(4,1fr);}
   .moves{grid-template-columns:repeat(3,1fr);}
-  .res .c,.moves .m{border:1px solid var(--line);border-radius:var(--r-card);padding:26px 24px 28px;background:#fff;}
+  .res .c,.moves .m{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:var(--r-card);padding:26px 24px 28px;background:#fff;}
   .res b,.moves b{display:block;font-size:14.5px;}
   .res i{display:block;font-style:normal;font-size:9px;color:var(--dim);letter-spacing:.4px;margin:8px 0 12px;font-family:Consolas,monospace;}
   .res p,.moves p{font-size:12.5px;line-height:1.9;color:var(--ink2);}
   .res a{display:inline-flex;font-size:12px;color:var(--accent);margin-top:16px;}
   .moves .m em{font-style:normal;font-size:9.5px;letter-spacing:1.6px;color:var(--accent);font-family:Consolas,monospace;}
   .moves .m b{margin:12px 0 8px;font-size:16px;}
-  .moves .m i{display:block;margin-top:16px;padding-top:12px;border-top:1px solid var(--line2);
+  .moves .m i{display:block;margin-top:auto;padding-top:12px;border-top:1px solid var(--line2);
     font-style:normal;font-size:10px;color:var(--dim);letter-spacing:.4px;}
 
   .refs{margin-top:40px;padding-top:24px;border-top:1px solid var(--line2);}
@@ -229,6 +205,7 @@
 
   /* ── 版式节奏：两条浅色带，把长页切成段 ── */
   .sec.alt{background:var(--surface);border-top:1px solid var(--line);border-bottom:1px solid var(--line);}
+  .sec.alt .spec td,.sec.alt .take td{border-bottom-color:var(--line);}
   .spec tbody tr,.take tbody tr{transition:background .16s;}
   .spec tbody tr:hover,.take tbody tr:hover{background:rgba(18,87,216,.035);}
 
@@ -246,13 +223,13 @@
 
   /* ── 首屏入场：只播一次，不做循环动画 ── */
   @media (prefers-reduced-motion: no-preference){
-    .hero .eyebrow,.hero h1,.hero .lead,.hero .acts,.hero .meta,.hero .diagram{
+    .hero .eyebrow,.hero h1,.hero .lead,.hero .acts,.hero .meta,.hero .boards{
       opacity:0;transform:translateY(10px);animation:rise .62s cubic-bezier(.22,.61,.36,1) forwards;}
     .hero h1{animation-delay:.06s}
     .hero .lead{animation-delay:.13s}
     .hero .acts{animation-delay:.19s}
     .hero .meta{animation-delay:.25s}
-    .hero .diagram{animation-delay:.10s}
+    .hero .boards{animation-delay:.10s}
   }
   @keyframes rise{to{opacity:1;transform:none;}}
 
@@ -267,6 +244,34 @@
   .poster .btn:hover{border-color:#fff;color:#fff;}
   .poster .btn.p{background:var(--accent);border-color:var(--accent);color:#fff;}
   .poster.gone{display:none;}
+
+  /* ── 首屏右侧：两张真实字段的卡，一张告警、一张记录 ── */
+  .boards{position:relative;margin:0;}
+  .boards::before{content:'';position:absolute;left:-28px;right:-28px;top:-28px;height:210px;z-index:0;
+    background-image:radial-gradient(circle at 1px 1px,rgba(18,87,216,.13) 1px,transparent 1px);
+    background-size:18px 18px;pointer-events:none;}
+  .board{position:relative;z-index:1;background:#fff;border:1px solid var(--line);
+    border-radius:var(--r-card);padding:20px 22px;}
+  .board.back{margin-right:56px;background:var(--surface);}
+  .board .bh{display:flex;align-items:center;justify-content:space-between;gap:12px;
+    font-family:Consolas,"SFMono-Regular",monospace;font-size:9.5px;letter-spacing:1.5px;color:var(--dim);}
+  .board .bh .lv{font-size:10.5px;letter-spacing:0;color:var(--amber);background:#fdf6ea;
+    border:1px solid #e8cf9f;padding:2px 8px;border-radius:4px;}
+  .board .bh .ok{font-size:10.5px;letter-spacing:0;color:var(--ok);}
+  .board h3{margin:12px 0 0;font-size:16px;line-height:1.55;letter-spacing:.4px;}
+  .board .bl{margin-top:14px;padding-top:13px;border-top:1px solid var(--line2);display:flex;flex-wrap:wrap;
+    gap:6px 16px;font-size:11px;color:var(--dim);}
+  .board .bl span{position:relative;padding-left:9px;}
+  .board .bl span::before{content:'';position:absolute;left:0;top:6px;width:3px;height:3px;background:#c3cddb;}
+  .turn{position:relative;z-index:1;display:flex;align-items:center;gap:12px;margin-left:34px;padding:12px 0;}
+  .turn s{width:1px;height:34px;background:linear-gradient(180deg,var(--line),var(--accent));text-decoration:none;}
+  .turn span{font-size:10px;letter-spacing:.8px;color:var(--ink2);}
+  .board.front{margin-left:56px;box-shadow:var(--sh-stage);}
+  .mgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;margin-top:16px;}
+  .mgrid i{height:22px;border:1px solid var(--line2);background:#fcfdff;}
+  .mgrid i.hit{border-color:#e0be86;background:#fdf6ea;}
+  .boards figcaption{margin-top:18px;font-size:10.5px;line-height:1.85;color:var(--dim);}
+  .boards figcaption b{color:var(--ink2);font-weight:400;}
 
   @media (max-width:1080px){
     .hero .grid{grid-template-columns:1fr;gap:44px;}
@@ -313,6 +318,10 @@
     .poster .p-mark,.poster p{display:none;}
     .poster h3{font-size:14px;}
     .poster{padding:14px;}
+    .board.back{margin-right:22px;}
+    .board.front{margin-left:22px;}
+    .board{padding:16px 16px;}
+    .board h3{font-size:14.5px;}
   }
 
   @media print{
@@ -324,7 +333,7 @@
     .hero .grid{grid-template-columns:1fr;}
     .hero h1{font-size:20pt;margin-top:4mm;}
     .hero .lead{font-size:10pt;line-height:1.7;max-width:none;}
-    .hero .acts,.hero .meta,.diagram,.band{display:none;}
+    .hero .acts,.hero .meta,.boards,.band{display:none;}
     .sec{padding:6mm 0 0;border-bottom:none;}
     .sec-head{padding-top:0;border-top:none;margin-bottom:4mm;}
     .sec-head h2{font-size:14pt;}
@@ -390,22 +399,20 @@
           <span><b>15</b> 固定点位</span><span><b>1</b> 台移动车</span><span><b>6</b> 步闭环</span><span><b>0</b> 外部依赖</span>
         </div>
       </div>
-      <figure class="diagram">
-        <div class="bar"><span>SCHEMATIC · 3 × 5 GRID</span><span class="mono"><s></s> 调度中</span></div>
-        <div class="plot">
-          <div class="cells">
-            <i><em>01</em></i><i><em>02</em></i><i><em>03</em></i><i><em>04</em></i><i><em>05</em></i>
-            <i><em>06</em></i><i><em>07</em></i><i><em>08</em></i><i class="hit"><em>09</em></i><i><em>10</em></i>
-            <i><em>11</em></i><i><em>12</em></i><i><em>13</em></i><i><em>14</em></i><i><em>15</em></i>
-          </div>
-          <svg class="paths" viewBox="0 0 400 250" preserveAspectRatio="none" aria-hidden="true">
-            <polyline points="70,225 70,178 130,178 130,88 245,88" fill="none" stroke="#1257d8" stroke-width="1.2" stroke-dasharray="5 4"/>
-            <circle cx="245" cy="88" r="4" fill="#b4731a"/>
-          </svg>
-          <div class="car">AGV-01</div>
-          <span class="scan"></span>
+      <figure class="boards">
+        <div class="board back">
+          <div class="bh"><span>ALERT · 15:24:22</span><span class="lv">需现场处理</span></div>
+          <h3>09 号点位 · 层内湿度低于阈值</h3>
+          <div class="bl"><span>3 层 5 列</span><span>偏差 12.4%</span><span>派给 AGV-01</span></div>
         </div>
-        <figcaption><b>点位图 · 示意图，不是现场照片。</b> 09 号点位报出异常，派单落到车上，路径按顺序穿过 12、08 两个架位再做确认。</figcaption>
+        <div class="turn"><s></s><span>3 min 19 s · 到点</span></div>
+        <div class="board front">
+          <div class="bh"><span>RECORD · 15:27:41</span><span class="ok">草稿已写回</span></div>
+          <h3>拍摄 3 张 · 判定「叶面失水」</h3>
+          <div class="mgrid" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="hit"></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          <div class="bl"><span>09-1527-01 … 03</span><span>待人工确认</span></div>
+        </div>
+        <figcaption><b>界面示意，不是现场照片。</b> 字段与分级取自《用户操作手册（简化版）》：告警、派单、到点、拍摄、记录草稿；最终判定由人签字。</figcaption>
       </figure>
     </div>
   </section>
@@ -753,7 +760,7 @@
     fr.src=fr.getAttribute('data-src');
     setTimeout(function(){
       if(!state.classList.contains('on')){ box.classList.add('bad'); txt.textContent='内嵌被拦截 · 请用新窗口'; }
-    }, 9000);
+    }, 20000);
   }
   fr.addEventListener('load', function(){ if(started) setTimeout(ready, 400); });
   document.getElementById('load-demo').addEventListener('click', loadDemo);
