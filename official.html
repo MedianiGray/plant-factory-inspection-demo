@@ -347,7 +347,7 @@
   @media print{
     @page{size:A4 portrait;margin:16mm 14mm;}
     html,body{background:#fff;}
-    header,.demo-tools,.fallback,.stage,#demo,#move .note{display:none!important;}
+    header,.demo-tools,.fallback,.stage,#move .note{display:none!important;}
     .wrap{max-width:none;padding:0;}
     .hero{padding:0 0 6mm;}
     .hero .grid{grid-template-columns:1fr;}
@@ -365,6 +365,7 @@
     .take th,.spec th,.take td,.spec td{font-size:8pt;padding:2mm;}
     .sec.alt{background:#fff;border-color:#fff;}
     .prog,.poster,.foot-links,.loadbar{display:none!important;}
+    .hero .eyebrow,.hero h1,.hero .lead,.hero .acts,.hero .meta,.hero .boards{opacity:1!important;transform:none!important;}
     *{box-shadow:none!important;animation:none!important;}
 
     body.print-spec .hero,body.print-spec .band,
@@ -373,6 +374,7 @@
     body.print-spec #move,body.print-spec #take,body.print-spec #bound{display:none!important;}
     body.print-spec #spec{padding:0;}
     body.print-spec .print-head{display:block;}
+    body.print-spec .sec-head,body.print-spec footer{display:none!important;}
     .print-head{margin-bottom:6mm;padding-bottom:4mm;border-bottom:1pt solid #000;}
     .print-head .k{font-family:Consolas,monospace;font-size:7.5pt;letter-spacing:1.5pt;color:#666;}
     .print-head b{display:block;font-size:16pt;margin:2mm 0 1.5mm;}
