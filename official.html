@@ -178,7 +178,19 @@
   .refs a b{display:block;font-size:12px;color:var(--ink);margin-bottom:4px;}
   .refs a span{font-size:9.5px;color:var(--dim);}
 
-  /* 08 取与不取 */
+  /* 08 迁移 */
+  .moves{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);}
+  .moves .m{background:#fff;padding:24px 24px 26px;}
+  .moves em{font-style:normal;font-size:9.5px;letter-spacing:1.4px;color:var(--blue);font-family:Consolas,monospace;}
+  .moves b{display:block;margin:10px 0 8px;font-size:15px;}
+  .moves p{font-size:12.5px;line-height:1.95;color:var(--ink2);min-height:96px;}
+  .moves i{display:block;margin-top:14px;padding-top:10px;border-top:1px solid var(--line2);
+    font-style:normal;font-size:10px;color:var(--dim);letter-spacing:.5px;}
+
+  a:focus-visible,button:focus-visible{outline:2px solid var(--blue);outline-offset:3px;}
+  .print-head{display:none;}
+
+  /* 09 取与不取 */
   .take{width:100%;border-collapse:collapse;border-top:1px solid var(--ink);}
   .take th{font-size:10px;letter-spacing:1.4px;color:var(--dim);text-align:left;font-weight:400;padding:10px 12px;border-bottom:1px solid var(--line);}
   .take td{font-size:11.5px;line-height:1.9;padding:14px 12px;border-bottom:1px solid var(--line2);vertical-align:top;}
@@ -221,6 +233,48 @@
     .refs .list{grid-template-columns:1fr;}
     .sec{padding:52px 0;}
   }
+  @media (max-width:1000px){
+    .moves{grid-template-columns:1fr;}
+  }
+
+  /* 打印：整页可直接 Ctrl+P；05 参数页可单独打印成一页 A4 */
+  @media print{
+    @page{size:A4 portrait;margin:16mm 14mm;}
+    html,body{background:#fff;}
+    header,.demo-tools,.fallback,footer,.stage,#demo,#move .note{display:none!important;}
+    .wrap{max-width:none;padding:0;}
+    .hero{padding:0 0 6mm;}
+    .hero .grid{grid-template-columns:1fr;}
+    .hero h1{font-size:20pt;margin-top:4mm;}
+    .hero .lead{font-size:10pt;line-height:1.7;max-width:none;}
+    .hero .acts,.hero .meta{display:none;}
+    .diagram{display:none;}
+    .band{display:none;}
+    .sec,.sec-head{padding:6mm 0 0;}
+    section{border-bottom:none;}
+    .q,.lede,.row p,.grow p,.layer .v,.moves p,.res p,.bound li{font-size:9pt;line-height:1.7;}
+    .grow{grid-template-columns:26mm 40mm 1fr;gap:6mm;}
+    .dodont,.steps,.moves,.res,.refs .list{page-break-inside:avoid;}
+    .take th,.spec th,.take td,.spec td{font-size:8pt;padding:2mm 2mm;}
+    .pagebreak{page-break-before:always;}
+    *{box-shadow:none!important;background-image:none!important;}
+
+    /* 只打 05：body.print-spec 时把其余节藏掉，只留参数表 */
+    body.print-spec .hero,
+    body.print-spec #gaps,body.print-spec #role,body.print-spec #demo,
+    body.print-spec #flow,body.print-spec #stack,body.print-spec #res,
+    body.print-spec #move,body.print-spec #take,body.print-spec #bound{display:none!important;}
+    body.print-spec #spec{padding:0;border:none;}
+    body.print-spec .print-head{display:block;}
+    .print-head{margin-bottom:6mm;padding-bottom:4mm;border-bottom:1pt solid #000;}
+    .print-head .k{font-family:Consolas,monospace;font-size:7.5pt;letter-spacing:1.5pt;color:#666;}
+    .print-head b{display:block;font-size:16pt;margin:2mm 0 1.5mm;}
+    .print-head p{font-size:8pt;color:#555;}
+    body.print-spec #spec .sec-head{margin-bottom:5mm;}
+    body.print-spec .spec td.k{width:22%;}
+    body.print-spec .spec td.v{width:36%;}
+    body.print-spec .spec td.s{width:42%;}
+  }
 </style>
 </head>
 <body>
@@ -239,6 +293,7 @@
       <a href="#spec">参数</a>
       <a href="#stack">底座</a>
       <a href="#res">资料</a>
+      <a href="#move">迁移</a>
     </nav>
     <div class="right">
       <span class="clock mono" id="nav-clock">--:--</span>
@@ -407,6 +462,15 @@
         <h2>参数，以及每个数字的出处</h2>
         <span class="hint">能标出处的一律标<br/>标不出的不写</span>
       </div>
+      <div class="demo-tools" style="margin:-8px 0 20px">
+        <span class="note">12 行，右侧一列是来源；可单独打印成一页 A4 带走。</span>
+        <button class="btn s" id="print-spec" type="button" style="margin-left:auto">打印参数页 P</button>
+      </div>
+      <div class="print-head">
+        <div class="k">PLANT FACTORY INSPECTION · PARAMETERS</div>
+        <b>数智植物工厂 · 参数与出处</b>
+        <p>medianigray.github.io/plant-factory-inspection-demo/official.html · 打印于 <span id="print-date">—</span></p>
+      </div>
       <table class="spec">
         <thead><tr><th>指标</th><th>数值</th><th>出处</th></tr></thead>
         <tbody>
@@ -474,10 +538,42 @@
     </div>
   </section>
 
-  <section class="sec" id="take">
+  <section class="sec" id="move">
     <div class="wrap">
       <div class="sec-head">
         <span class="sec-no">08</span>
+        <h2>怎么搬到另一个棚</h2>
+        <span class="hint">这套东西没有绑死在 15 个点位上<br/>换一个棚，改三张表</span>
+      </div>
+      <p class="lede" style="margin-bottom:32px">搬走的时候不需要重写一遍系统。点位、阈值、记录字段各是一张表，换掉就能跑；真正要重做的只有三维场景本身——它得按新棚的架体尺寸重搭一次。</p>
+      <div class="moves">
+        <div class="m">
+          <em>01</em>
+          <b>点位表</b>
+          <p>把 3 行 5 列换成新棚的行列与编号，顺带写清层高、朝向、可达性。演示里换一份点位配置，路网与派单顺序跟着重算。</p>
+          <i>改动：1 份点位配置</i>
+        </div>
+        <div class="m">
+          <em>02</em>
+          <b>告警阈值</b>
+          <p>沿用平台既有的分级口径（提醒 → 需现场处理），把阈值按新棚的作物与季节抄一遍，不另起一套告警体系。</p>
+          <i>改动：1 张阈值表</i>
+        </div>
+        <div class="m">
+          <em>03</em>
+          <b>记录字段</b>
+          <p>点位、时间、画面、判断口径四项是骨架。新棚要加「批次」或「品种」，是加一列，不加一套新逻辑。</p>
+          <i>改动：1 列字段</i>
+        </div>
+      </div>
+      <p class="note" style="margin-top:26px">迁移的实话：页面、派单逻辑、记录结构可以直接复用；三维场景按新棚尺寸重搭一次（约 1–2 天）；真机对接不在这一版里，仍是下一步。</p>
+    </div>
+  </section>
+
+  <section class="sec" id="take">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="sec-no">09</span>
         <h2>取与不取</h2>
         <span class="hint">评审最容易问「你抄了多少」<br/>答案提前摆在这里</span>
       </div>
@@ -498,7 +594,7 @@
   <section class="sec" id="bound" style="border-bottom:none">
     <div class="wrap">
       <div class="sec-head">
-        <span class="sec-no">09</span>
+        <span class="sec-no">10</span>
         <h2>现在是真的是什么，仍是模拟的是什么</h2>
       </div>
       <div class="bound">
@@ -581,6 +677,18 @@
     }, { rootMargin: '-45% 0px -50% 0px', threshold: 0 });
     targets.forEach(function(t){ io.observe(t); });
   }
+
+  // 只打印 05 参数页：换成一页 A4，打完还原
+  var pd = document.getElementById('print-date');
+  document.getElementById('print-spec').addEventListener('click', function(){
+    var d = new Date();
+    pd.textContent = d.getFullYear() + '-' + ('0'+(d.getMonth()+1)).slice(-2) + '-' + ('0'+d.getDate()).slice(-2);
+    document.body.classList.add('print-spec');
+    window.print();
+  });
+  window.addEventListener('afterprint', function(){
+    document.body.classList.remove('print-spec');
+  });
 })();
 </script>
 </body>
