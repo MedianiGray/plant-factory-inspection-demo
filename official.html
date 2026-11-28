@@ -11,6 +11,7 @@
 <meta property="og:description" content="告警之后，有人到点。演示在本页直接运行。"/>
 <meta name="twitter:card" content="summary"/>
 <link rel="canonical" href="https://medianigray.github.io/plant-factory-inspection-demo/official.html"/>
+<link rel="prefetch" href="index.html" as="document"/>
 <style>
   :root{
     /* 一套 4 档间距 */
@@ -903,8 +904,11 @@
   function loadDemo(){
     if(started) return;
     started=true; t0=performance.now(); tLoad=0;
-    box.classList.remove('bad'); state.classList.remove('on'); txt.textContent='演示正在载入';
+    box.classList.remove('bad'); state.classList.remove('on'); txt.textContent='演示正在载入 · 首屏约 15 秒，三维场景较大';
     fr.src=fr.getAttribute('data-src');
+    armGuard();
+  }
+  function armGuard(){
     setTimeout(function(){
       if(state.classList.contains('on')) return;
       var done=false;
@@ -924,8 +928,9 @@
   } else { loadDemo(); }
   document.getElementById('reload').addEventListener('click', function(){
     if(!started){ loadDemo(); return; }
-    box.classList.remove('bad'); state.classList.remove('on'); txt.textContent='演示正在载入';
+    box.classList.remove('bad'); state.classList.remove('on'); txt.textContent='演示正在载入 · 首屏约 15 秒，三维场景较大';
     var st=box.closest('.stage'); if(st) st.classList.remove('loaded');
+    t0=performance.now(); tLoad=0; armGuard();
     fr.src='index.html?r='+Date.now();
   });
 
