@@ -6,6 +6,7 @@
 <title>数智植物工厂 · 固定监测 ＋ 移动复核</title>
 <meta name="description" content="高架叶菜植物工厂的巡检方案：固定监测持续盯着，一台移动车补上「到点确认」。演示在本页直接运行，参数标注出处。"/>
 <meta name="theme-color" content="#ffffff"/>
+<link rel="icon" type="image/svg+xml" href="favicon.svg"/>
 <meta property="og:type" content="website"/>
 <meta property="og:title" content="数智植物工厂 · 固定监测 ＋ 移动复核"/>
 <meta property="og:description" content="告警之后，有人到点。演示在本页直接运行。"/>
@@ -35,6 +36,8 @@
   h1,h2,h3{margin:0;font-weight:600;}
   section{scroll-margin-top:96px;}
   a:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:3px;}
+  .skip{position:absolute;left:16px;top:-52px;z-index:60;background:#fff;color:var(--ink);padding:9px 16px;border:1px solid var(--line);border-radius:8px;font-size:13.5px;transition:top .2s;}
+  .skip:focus{top:14px;}
 
   /* ── 顶栏：一层，五个入口 ── */
   header{position:sticky;top:0;z-index:30;background:rgba(255,255,255,.9);
@@ -453,6 +456,7 @@
 </style>
 </head>
 <body>
+<a class="skip" href="#gaps">跳到正文</a>
 <div class="prog" id="prog" aria-hidden="true"></div>
 
 <header>
