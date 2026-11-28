@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8"/>
@@ -150,7 +150,7 @@
   .frame{position:relative;width:100%;aspect-ratio:16/9;background:#05080f;overflow:hidden;border-radius:8px;}
   .frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0;display:block;}
   .fallback{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:14px;
-    text-align:center;padding:26px;background:#0a1018;color:#dfe9f4;}
+    text-align:center;padding:26px;background:#0a1018;color:#dfe9f4;z-index:3;}
   .frame.bad .fallback{display:flex;}
   .fallback b{font-size:15px;}
   .fallback p{font-size:11.5px;line-height:1.9;color:#9db2c8;max-width:520px;}
@@ -227,6 +227,47 @@
 
   .print-head{display:none;}
 
+  /* ── 版式节奏：两条浅色带，把长页切成段 ── */
+  .sec.alt{background:var(--surface);border-top:1px solid var(--line);border-bottom:1px solid var(--line);}
+  .spec tbody tr,.take tbody tr{transition:background .16s;}
+  .spec tbody tr:hover,.take tbody tr:hover{background:rgba(18,87,216,.035);}
+
+  /* ── 排印细节：数字对齐、长句平衡 ── */
+  h1,h2{text-wrap:balance;}
+  .mono,td,.hero .meta b{font-variant-numeric:tabular-nums;}
+  .foot-links{display:flex;flex-wrap:wrap;gap:6px 26px;margin-top:26px;padding-top:18px;
+    border-top:1px solid var(--line2);font-size:11.5px;color:var(--ink2);}
+  .foot-links a{transition:color .18s;}
+  .foot-links a:hover{color:var(--ink);text-decoration:underline;text-underline-offset:3px;}
+
+  /* ── 顶部读进度的细线：一条，随滚动增长 ── */
+  .prog{position:fixed;left:0;top:0;height:2px;width:100%;z-index:45;transform:scaleX(0);
+    transform-origin:0 50%;background:var(--accent);transition:transform .1s linear;}
+
+  /* ── 首屏入场：只播一次，不做循环动画 ── */
+  @media (prefers-reduced-motion: no-preference){
+    .hero .eyebrow,.hero h1,.hero .lead,.hero .acts,.hero .meta,.hero .diagram{
+      opacity:0;transform:translateY(10px);animation:rise .62s cubic-bezier(.22,.61,.36,1) forwards;}
+    .hero h1{animation-delay:.06s}
+    .hero .lead{animation-delay:.13s}
+    .hero .acts{animation-delay:.19s}
+    .hero .meta{animation-delay:.25s}
+    .hero .diagram{animation-delay:.10s}
+  }
+  @keyframes rise{to{opacity:1;transform:none;}}
+
+  /* ── 演示占位：页面打开时先不拉 2.4 MB ── */
+  .poster{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:12px;text-align:center;background:#080e16;color:#e6eef7;padding:26px;transition:opacity .3s;z-index:2;}
+  .poster .p-mark{width:34px;height:34px;border:1px solid rgba(255,255,255,.22);position:relative;margin-bottom:2px;}
+  .poster .p-mark::after{content:'';position:absolute;left:9px;top:9px;width:14px;height:14px;border:1px solid var(--accent);}
+  .poster h3{font-size:16px;letter-spacing:.5px;}
+  .poster p{font-size:11.5px;line-height:1.9;color:#93a6bd;}
+  .poster .btn{height:36px;padding:0 16px;font-size:12.5px;background:transparent;color:#dfe9f4;border-color:rgba(255,255,255,.28);}
+  .poster .btn:hover{border-color:#fff;color:#fff;}
+  .poster .btn.p{background:var(--accent);border-color:var(--accent);color:#fff;}
+  .poster.gone{display:none;}
+
   @media (max-width:1080px){
     .hero .grid{grid-template-columns:1fr;gap:44px;}
     .hero{padding:64px 0 48px;}
@@ -268,6 +309,10 @@
     .spec td.v,.take td.a{font-size:13.5px;margin-bottom:6px;}
     .spec td.s,.take td.b{font-size:11px;}
     .take td.b:before{content:'不取 · ';color:var(--dim);}
+    /* 占位在小屏只留标题与按钮，别把按钮挤出画框 */
+    .poster .p-mark,.poster p{display:none;}
+    .poster h3{font-size:14px;}
+    .poster{padding:14px;}
   }
 
   @media print{
@@ -289,6 +334,8 @@
     .grow p,.lede,.q,.dodont li,.layer .v,.res p,.moves p,.bound li{font-size:9pt;line-height:1.7;}
     .q{font-size:11pt;}
     .take th,.spec th,.take td,.spec td{font-size:8pt;padding:2mm;}
+    .sec.alt{background:#fff;border-color:#fff;}
+    .prog,.poster,.foot-links{display:none!important;}
     *{box-shadow:none!important;animation:none!important;}
 
     body.print-spec .hero,body.print-spec .band,
@@ -305,6 +352,7 @@
 </style>
 </head>
 <body>
+<div class="prog" id="prog" aria-hidden="true"></div>
 
 <header>
   <div class="wrap nav">
@@ -438,7 +486,7 @@
         <span class="hint">这一块是页面本身<br/>不是视频，也不是截图</span>
       </div>
       <div class="demo-tools">
-        <div class="state" id="state"><s></s><span id="state-txt">演示正在载入</span></div>
+        <div class="state" id="state"><s></s><span id="state-txt">演示未载入 · 滚到本节自动开始</span></div>
         <a class="btn s" href="index.html" target="_blank" rel="noopener" style="margin-left:auto">全屏演示 ↗</a>
         <a class="btn s" href="index.html" target="_blank" rel="noopener">新窗口打开 ↗</a>
         <button class="btn s" id="reload" type="button">重新载入</button>
@@ -446,7 +494,13 @@
       <div class="stage">
         <div class="topline"><span class="mono">INSPECTION VIEW · 三维巡检演示</span><span class="mono" id="stage-clock">--:--:--</span></div>
         <div class="frame" id="frame-box">
-          <iframe id="frame" src="index.html" title="数智植物工厂三维巡检演示" loading="eager" allowfullscreen></iframe>
+          <div class="poster" id="poster">
+            <div class="p-mark"></div>
+            <h3>三维巡检演示</h3>
+            <p>单文件 · <span class="mono">2,438,509 字节</span> · 按需载入<br/>滚到此处自动开始，也可手动载入</p>
+            <button class="btn p" id="load-demo" type="button">载入演示</button>
+          </div>
+          <iframe id="frame" data-src="index.html" title="数智植物工厂三维巡检演示" allowfullscreen></iframe>
           <div class="fallback">
             <b>当前浏览器拦住了内嵌页面</b>
             <p>演示页体积较大，部分环境会限制 iframe 载入。点下面按钮在新窗口打开，效果完全一样。</p>
@@ -480,7 +534,7 @@
     </div>
   </section>
 
-  <section class="sec" id="spec">
+  <section class="sec alt" id="spec">
     <div class="wrap">
       <div class="sec-head">
         <span class="sec-no">05</span>
@@ -563,7 +617,7 @@
     </div>
   </section>
 
-  <section class="sec" id="move">
+  <section class="sec alt" id="move">
     <div class="wrap">
       <div class="sec-head">
         <span class="sec-no">08</span>
@@ -658,6 +712,14 @@
       <span class="mono" id="foot-clock">2026-11-28</span>
     </div>
   </div>
+  <div class="wrap foot-links">
+    <a href="official.html">官网页</a>
+    <a href="index.html">三维巡检演示</a>
+    <a href="slides.html">网页版 PPT · 十页</a>
+    <a href="download/plant-factory-demo-1.6.0.zip">离线包 · 1.1 MB</a>
+    <a href="README.md">说明文档</a>
+    <a href="https://github.com/MedianiGray/plant-factory-inspection-demo" target="_blank" rel="noopener">GitHub 仓库 ↗</a>
+  </div>
 </footer>
 
 <script>
@@ -677,17 +739,47 @@
   var state=document.getElementById('state');
   var txt=document.getElementById('state-txt');
   var fr=document.getElementById('frame');
+  var poster=document.getElementById('poster');
+  var demo=document.getElementById('demo');
+  var started=false;
   function ready(){
     box.classList.remove('bad'); state.classList.add('on'); txt.textContent='演示已载入 · 可直接操作';
+    poster.classList.add('gone');
   }
-  fr.addEventListener('load', function(){ setTimeout(ready, 400); });
-  setTimeout(function(){
-    if(!state.classList.contains('on')){ box.classList.add('bad'); txt.textContent='内嵌被拦截 · 请用新窗口'; }
-  }, 9000);
+  function loadDemo(){
+    if(started) return;
+    started=true;
+    box.classList.remove('bad'); state.classList.remove('on'); txt.textContent='演示正在载入';
+    fr.src=fr.getAttribute('data-src');
+    setTimeout(function(){
+      if(!state.classList.contains('on')){ box.classList.add('bad'); txt.textContent='内嵌被拦截 · 请用新窗口'; }
+    }, 9000);
+  }
+  fr.addEventListener('load', function(){ if(started) setTimeout(ready, 400); });
+  document.getElementById('load-demo').addEventListener('click', loadDemo);
+  if ('IntersectionObserver' in window) {
+    var dio = new IntersectionObserver(function(es){
+      es.forEach(function(e){ if(e.isIntersecting){ loadDemo(); dio.disconnect(); } });
+    }, { rootMargin: '260px 0px', threshold: 0 });
+    dio.observe(demo);
+  } else { loadDemo(); }
   document.getElementById('reload').addEventListener('click', function(){
+    if(!started){ loadDemo(); return; }
     box.classList.remove('bad'); state.classList.remove('on'); txt.textContent='演示正在载入';
     fr.src='index.html?r='+Date.now();
   });
+
+  // 顶部细线：读到全文的几成
+  var prog=document.getElementById('prog');
+  function paintProg(){
+    var h=document.documentElement;
+    var max=h.scrollHeight-h.clientHeight;
+    var p=max>0?h.scrollTop/max:0;
+    prog.style.transform='scaleX('+p.toFixed(4)+')';
+  }
+  paintProg();
+  window.addEventListener('scroll', paintProg, {passive:true});
+  window.addEventListener('resize', paintProg);
 
   // 导航高亮：滚到哪一节，顶上那一项就亮
   var links = [].slice.call(document.querySelectorAll('.nav nav a'));
