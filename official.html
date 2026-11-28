@@ -11,7 +11,6 @@
 <meta property="og:description" content="告警之后，有人到点。演示在本页直接运行。"/>
 <meta name="twitter:card" content="summary"/>
 <link rel="canonical" href="https://medianigray.github.io/plant-factory-inspection-demo/official.html"/>
-<link rel="prefetch" href="index.html" as="document"/>
 <style>
   :root{
     /* 一套 4 档间距 */
@@ -600,7 +599,7 @@
       </div>
       <p class="print-only">这一节是可直接操作的三维巡检页面，纸面不复现其画面。要现场演示，打开 medianigray.github.io/plant-factory-inspection-demo/index.html 即可（单文件，离线包同源）。</p>
       <div class="demo-tools">
-        <div class="state" id="state"><s></s><span id="state-txt">演示未载入 · 滚到本节自动开始</span></div>
+        <div class="state" id="state"><s></s><span id="state-txt">演示未载入 · 打开本页后自动载入</span></div>
         <a class="btn s" href="index.html" target="_blank" rel="noopener" style="margin-left:auto">全屏演示 ↗</a>
         <a class="btn s" href="index.html" target="_blank" rel="noopener">新窗口打开 ↗</a>
         <button class="btn s" id="reload" type="button">重新载入</button>
@@ -920,6 +919,10 @@
   }
   fr.addEventListener('load', function(){ if(started){ tLoad=performance.now(); setTimeout(ready, 400); } });
   document.getElementById('load-demo').addEventListener('click', loadDemo);
+  // 不等滚到本节：页面打开 3 秒就先把演示拉起来，答辩时走过去已经就绪
+  function autoStart(){ setTimeout(function(){ if(!started) loadDemo(); }, 3000); }
+  if (document.readyState === 'complete') autoStart();
+  else window.addEventListener('load', autoStart, {once:true});
   if ('IntersectionObserver' in window) {
     var dio = new IntersectionObserver(function(es){
       es.forEach(function(e){ if(e.isIntersecting){ loadDemo(); dio.disconnect(); } });
