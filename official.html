@@ -624,7 +624,7 @@
       </div>
       <div class="stage-foot">
         <p class="note">可以点、可以拖、可以切到场景编辑。<b>演示里的巡检车与路线是三维模拟</b>，没有接实训车；点位编号、告警分级、图片与记录结构取自实训室手册。</p>
-        <p class="note">体积 <span class="mono">2,438,509 字节</span>，单文件，离线包同源。</p>
+        <p class="note" id="stage-size">体积 <span class="mono">2,438,509 字节</span>，单文件，离线包同源。</p>
       </div>
     </div>
   </section>
@@ -853,7 +853,7 @@
   </div>
   <div class="wrap foot-base">
     <span>© 2026 覃祖悦 · 单文件站点 · 无第三方统计与追踪</span>
-    <span class="mono">official.html · Ctrl+P 为 A4 八页</span>
+    <span class="mono">数字键 1–0 跳节 · Ctrl+P 为 A4 八页</span>
   </div>
 </footer>
 
@@ -877,21 +877,39 @@
   var poster=document.getElementById('poster');
   var demo=document.getElementById('demo');
   var started=false;
+  var t0=0, tLoad=0;
+  function stampSize(){
+    var el=document.getElementById('stage-size'); if(!el) return;
+    var bytes=0, ms=0;
+    try{
+      var res=performance.getEntriesByType('resource').filter(function(e){ return /index\.html/.test(e.name); });
+      var last=res[res.length-1];
+      if(last) bytes=last.encodedBodySize||last.transferSize||0;
+    }catch(e){}
+    if(tLoad && t0) ms=Math.round(tLoad-t0);
+    if(!bytes && !ms) return;
+    var parts=[];
+    if(bytes) parts.push('体积 <span class="mono">'+bytes.toLocaleString('en-US')+' 字节</span>');
+    if(ms && ms<60000) parts.push('本次载入 <span class="mono">'+(ms/1000).toFixed(1)+' s</span>');
+    el.innerHTML=parts.join(' · ')+' · 单文件，离线包同源。';
+  }
   function ready(){
     box.classList.remove('bad'); state.classList.add('on'); txt.textContent='演示已载入 · 可直接操作';
     poster.classList.add('gone');
     var stage=box.closest('.stage'); if(stage) stage.classList.add('loaded');
+    if(!tLoad) tLoad=performance.now();
+    stampSize();
   }
   function loadDemo(){
     if(started) return;
-    started=true;
+    started=true; t0=performance.now(); tLoad=0;
     box.classList.remove('bad'); state.classList.remove('on'); txt.textContent='演示正在载入';
     fr.src=fr.getAttribute('data-src');
     setTimeout(function(){
       if(!state.classList.contains('on')){ box.classList.add('bad'); txt.textContent='内嵌被拦截 · 请用新窗口'; }
     }, 20000);
   }
-  fr.addEventListener('load', function(){ if(started) setTimeout(ready, 400); });
+  fr.addEventListener('load', function(){ if(started){ tLoad=performance.now(); setTimeout(ready, 400); } });
   document.getElementById('load-demo').addEventListener('click', loadDemo);
   if ('IntersectionObserver' in window) {
     var dio = new IntersectionObserver(function(es){
@@ -904,6 +922,24 @@
     box.classList.remove('bad'); state.classList.remove('on'); txt.textContent='演示正在载入';
     var st=box.closest('.stage'); if(st) st.classList.remove('loaded');
     fr.src='index.html?r='+Date.now();
+  });
+
+  // 数字键 1–0 跳到对应一节；答辩时不用滚着找
+  var secMap = ['gaps','role','demo','flow','spec','stack','res','move','take','bound'];
+  document.addEventListener('keydown', function(e){
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    var tag = (e.target && e.target.tagName) || '';
+    if (/^(INPUT|TEXTAREA|SELECT)$/.test(tag) || (e.target && e.target.isContentEditable)) return;
+    var k = e.key;
+    var idx = -1;
+    if (/^[1-9]$/.test(k)) idx = parseInt(k, 10) - 1;
+    else if (k === '0') idx = 9;
+    if (idx < 0) return;
+    var el = document.getElementById(secMap[idx]);
+    if (!el) return;
+    e.preventDefault();
+    history.replaceState(null, '', '#' + secMap[idx]);
+    el.scrollIntoView({behavior: 'smooth', block: 'start'});
   });
 
   // 顶部细线：读到全文的几成
