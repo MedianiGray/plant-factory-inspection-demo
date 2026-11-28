@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>网页版 PPT · 五个官网入口，落在同一块面板里</title>
+<style>
+  :root{
+    --bg:#101418; --ink:#f0f2ef; --body:#b8bcc2; --dim:#7c8792;
+    --cyan:#3fb6e8; --line:rgba(255,255,255,.12); --line2:rgba(255,255,255,.07);
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;}
+  body{margin:0;background:#07090c;color:var(--ink);overflow:hidden;
+    font-family:"Microsoft YaHei","PingFang SC","Segoe UI",sans-serif;}
+  .mono{font-family:Consolas,"SFMono-Regular",monospace;}
+
+  .deck{position:relative;margin:0 auto;background:var(--bg);
+    width:min(100vw,177.7vh);aspect-ratio:16/9;overflow:hidden;
+    font-size:calc(min(100vw,177.7vh) * 0.01);}
+  .slide{position:absolute;inset:0;display:none;padding:5.2em 5.6em 6em;}
+  .slide.on{display:block;}
+
+  .kicker{position:absolute;left:5.6em;top:4.6em;font-size:.82em;letter-spacing:.3em;color:var(--cyan);}
+  .pgno{position:absolute;right:5.6em;top:4.6em;font-size:.78em;letter-spacing:.2em;color:rgba(255,255,255,.42);}
+  .rule{position:absolute;left:5.6em;right:5.6em;top:6.4em;height:1px;background:var(--line);}
+
+  h1{font-size:3.3em;line-height:1.24;margin:0;font-weight:600;letter-spacing:.02em;}
+  h2{font-size:2.2em;line-height:1.3;margin:0;font-weight:600;}
+  .lead{margin-top:1.1em;font-size:1.02em;line-height:1.85;color:var(--body);max-width:52em;}
+  .micro{margin-top:1em;font-size:.78em;line-height:1.8;color:var(--dim);}
+  .hl{color:var(--cyan);font-style:normal;}
+  .strong{color:#fff;}
+
+  /* 封面 */
+  .cover-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.42;}
+  .cover-scrim{position:absolute;inset:0;background:
+    linear-gradient(90deg,rgba(16,20,24,.97) 0%,rgba(16,20,24,.9) 42%,rgba(16,20,24,.42) 100%);}
+  .cover-body{position:relative;padding-top:6.2em;}
+  .cover-meta{margin-top:2.4em;font-size:.8em;line-height:1.9;color:rgba(255,255,255,.5);}
+
+  /* 目录 */
+  .toc{display:grid;grid-template-columns:1fr;gap:.2em;margin-top:2.4em;}
+  .toc-row{display:grid;grid-template-columns:5.5em 1fr;gap:1.2em;padding:1.15em 0;border-top:1px solid var(--line2);align-items:start;}
+  .toc-row:first-child{border-top:none;}
+  .toc-row em{font-style:normal;font-size:2em;color:var(--cyan);line-height:1;}
+  .toc-row b{display:block;font-size:1.15em;font-weight:600;}
+  .toc-row p{margin:.45em 0 0;font-size:.86em;line-height:1.8;color:var(--body);}
+
+  /* 表格（div 版，便于缩放） */
+  .tbl{display:grid;margin-top:1.8em;border:1px solid var(--line2);}
+  .tbl.h3{grid-template-columns:12em 18em 1fr;}
+  .tbl .th,.tbl .td{padding:.95em 1.1em;border-bottom:1px solid var(--line2);border-right:1px solid var(--line2);font-size:.86em;line-height:1.7;}
+  .tbl .th{background:rgba(255,255,255,.06);font-weight:600;}
+  .tbl .td{color:var(--body);}
+  .tbl .td.mono{font-size:.8em;color:#cfe0f2;}
+  .tbl .col1{color:var(--cyan);}
+
+  /* 四步 */
+  .quart{display:grid;grid-template-columns:repeat(4,1fr);gap:1.6em;margin-top:3.2em;}
+  .q em{font-style:normal;display:block;font-size:2.6em;line-height:1;color:var(--cyan);}
+  .q b{display:block;margin:.8em 0 .5em;font-size:1.06em;}
+  .q p{font-size:.8em;line-height:1.8;color:var(--body);margin:0;}
+
+  /* 图 + 说明 两栏 */
+  .two{display:grid;grid-template-columns:1.08fr .92fr;gap:2.6em;margin-top:2em;align-items:start;}
+  .fig{border:1px solid var(--line);padding:.4em;background:#0b0f13;}
+  .fig img{display:block;width:100%;height:auto;}
+  .figcap{margin-top:.55em;font-size:.72em;color:var(--dim);}
+
+  .blocks{margin-top:.2em;}
+  .blk{padding:.9em 0;border-top:1px solid var(--line2);}
+  .blk:first-child{border-top:none;padding-top:0;}
+  .blk b{display:block;font-size:.96em;}
+  .blk p{margin:.35em 0 0;font-size:.8em;line-height:1.8;color:var(--body);}
+
+  /* 数字 */
+  .kv{margin-top:1.4em;}
+  .kv .row{padding:.85em 0;border-top:1px solid var(--line2);}
+  .kv .row:first-child{border-top:none;}
+  .kv b{display:block;font-size:1.55em;font-weight:600;letter-spacing:.01em;}
+  .kv p{margin:.2em 0 0;font-size:.76em;color:var(--dim);line-height:1.7;}
+
+  /* 边界 */
+  .lists{display:grid;grid-template-columns:1fr 1fr;gap:2.6em;margin-top:1.6em;}
+  .lists b{display:block;font-size:.98em;margin-bottom:.7em;}
+  .lists ul{margin:0;padding-left:1.1em;}
+  .lists li{font-size:.82em;line-height:1.95;color:var(--body);}
+  .quote{margin-top:1.8em;font-size:1.4em;line-height:1.6;color:#fff;}
+
+  /* 底部 */
+  .foot{position:absolute;left:5.6em;right:5.6em;bottom:2em;display:flex;justify-content:space-between;
+    gap:1.4em;font-size:.68em;color:var(--dim);line-height:1.7;}
+
+  /* 控制条 */
+  .ui{position:fixed;left:0;right:0;bottom:0;z-index:20;display:flex;align-items:center;gap:14px;
+    padding:10px 18px;background:linear-gradient(180deg,rgba(7,9,12,0),rgba(7,9,12,.92) 40%);
+    transition:opacity .3s;}
+  .ui.hide{opacity:0;pointer-events:none;}
+  .ui button{background:none;border:1px solid rgba(255,255,255,.18);color:#b8bcc2;font-family:inherit;
+    font-size:11px;letter-spacing:1px;padding:7px 12px;cursor:pointer;}
+  .ui button:hover{color:#fff;border-color:var(--cyan);}
+  .ui .dots{display:flex;gap:6px;margin:0 auto;}
+  .ui .dots i{width:18px;height:3px;background:rgba(255,255,255,.18);cursor:pointer;font-style:normal;}
+  .ui .dots i.on{background:var(--cyan);}
+  .ui .num{font-family:Consolas,monospace;font-size:11px;color:#7c8792;letter-spacing:1px;}
+  .ui .num b{color:#fff;font-weight:400;}
+
+  /* 讲稿抽屉 */
+  .note{position:fixed;left:0;right:0;bottom:54px;z-index:19;display:none;padding:16px 22px;
+    background:rgba(8,12,16,.96);border-top:1px solid rgba(63,182,232,.3);}
+  .note.on{display:block;}
+  .note b{display:block;font-size:10px;letter-spacing:2px;color:var(--cyan);margin-bottom:8px;}
+  .note p{margin:0;font-size:12.5px;line-height:1.9;color:#cfe0f2;max-width:1100px;}
+</style>
+</head>
+<body>
+
+<div class="deck" id="deck">
+
+  <!-- 01 封面 -->
+  <section class="slide on" data-note="开场：这一份不是把链接贴进 PPT，而是把五个入口做成页面里能点开的面板。今天讲的是这套动作怎么走。">
+    <img class="cover-img" src="screenshots/01-overview.png" alt="展示页三维巡检场景"/>
+    <div class="cover-scrim"></div>
+    <div class="cover-body">
+      <div class="kicker">课程汇报 · 植物工厂巡检展示页 · 2026-11-28</div>
+      <h1>五个官网入口，<br/>落在同一块面板里</h1>
+      <p class="lead">从老师推荐的官网，到可当场点开的展示页 <span class="mono hl">v1.6.0</span>：<br/>
+        页面能操作，包能下载，面板能打开。</p>
+      <div class="cover-meta">
+        覃祖悦 · 网络工程技术（本）2502 · 广西农业职业技术大学信息工程学院<br/>
+        展示页 2,437,653 字节 · 演示包 1,104,614 字节 · 两块面板（官方资料 / 汇报材料）都能点开
+      </div>
+    </div>
+    <div class="pgno mono">01 / 09</div>
+  </section>
+
+  <!-- 02 目录 -->
+  <section class="slide" data-note="三块：入口怎么读、成品是什么、效果怎么验。每块都能在页面上当场对上。">
+    <div class="kicker">目录 · 三块内容</div>
+    <div class="pgno mono">02 / 09</div>
+    <div class="rule"></div>
+    <div style="padding-top:2.2em">
+      <h2>入口怎么读、成品是什么、效果怎么验</h2>
+      <div class="toc">
+        <div class="toc-row"><em>01</em><div><b>模式 · 五个入口分四类，四步走完一个</b>
+          <p>设备厂商、开源系统、行业方案、实拍视频，处理动作各不相同；认厂商、读参数、对场景、落模块。</p></div></div>
+        <div class="toc-row"><em>02</em><div><b>成品 · 官网页、展示页、下载包、PPT 同源</b>
+          <p>一套内容几个载体：官网页做门面且内嵌演示，展示页给人现场操作，下载包给断网的教室，网页版 PPT 讲这套动作怎么复用。</p></div></div>
+        <div class="toc-row"><em>03</em><div><b>效果 · 截图、线上状态、真实字节数</b>
+          <p>面板能打开、包能下载、数字能复核，不靠口头描述。</p></div></div>
+      </div>
+      <p class="micro">来源：曾恒老师 2026-11-26 群内转发的官网与视频号链接 · 处理结果见展示页 v1.6.0</p>
+    </div>
+  </section>
+
+  <!-- 03 四类入口 -->
+  <section class="slide" data-note="五个链接其实是四类：查参数、看系统能力、找落地参照、对真实运行。先分类，再决定读什么。">
+    <div class="kicker">01 · 模式</div>
+    <div class="pgno mono">03 / 09</div>
+    <div class="rule"></div>
+    <div style="padding-top:2.2em">
+      <h2>老师给的五个入口，其实是四类资料</h2>
+      <p class="lead">同一批链接，动作不同：查参数、看系统能力、找落地参照、对真实运行。先分类，再决定读什么。</p>
+      <div class="tbl h3">
+        <div class="th">类别</div><div class="th">入口</div><div class="th">这里读什么</div>
+        <div class="td col1">设备厂商</div><div class="td mono">elephantrobotics.com</div>
+        <div class="td">看 myAGV 的形态、负载、接口；页面里的车按它外形比例与轴距建模</div>
+        <div class="td col1">开源系统</div><div class="td mono">openharmony.cn</div>
+        <div class="td">设备侧系统与分布式能力，对应「终端 — 边缘 — 云」的前两层</div>
+        <div class="td col1">行业方案</div><div class="td mono">kaihong.com</div>
+        <div class="td">国产化系统与边缘盒落地方式，讲信创环节时的参照</div>
+        <div class="td col1">实拍演示</div><div class="td mono">视频号（一）·（二）</div>
+        <div class="td">真机运行流程，与三维场景逐段对照看</div>
+      </div>
+      <p class="micro">四个类别已在展示页「官方资料」面板中逐条对应，域名与视频链接可当场点开核对。</p>
+    </div>
+  </section>
+
+  <!-- 04 四步 -->
+  <section class="slide" data-note="四步：认厂商、读参数、对场景、落模块。前三步自己判断，第四步才交给 AI；顺序反过来，页面就只剩好看的壳。">
+    <div class="kicker">01 · 模式</div>
+    <div class="pgno mono">04 / 09</div>
+    <div class="rule"></div>
+    <div style="padding-top:2.2em">
+      <h2>一个入口走完四步：认厂商、读参数、对场景、落模块</h2>
+      <p class="lead">前三步靠判断，第四步才交给 AI 实现；顺序反过来，页面就只剩好看的壳。</p>
+      <div class="quart">
+        <div class="q"><em>01</em><b>认厂商</b><p>先看首页的定位句与产品线，判断它是设备商、系统方，还是行业方案商。</p></div>
+        <div class="q"><em>02</em><b>读参数</b><p>负载、轴距、续航、接口，只取与巡检动作有关的那几项，其余不往页面里抄。</p></div>
+        <div class="q"><em>03</em><b>对场景</b><p>挑两条这条巡检线真用得上的能力写进流程，用不上的明确标成「本项目未使用」。</p></div>
+        <div class="q"><em>04</em><b>落模块</b><p>五条入口、两块成果、三句说明，写成一块面板；AI 出界面，自己逐条验收。</p></div>
+      </div>
+      <p class="quote">判断错了，AI 只会把错的东西做得更漂亮：前三步定对错，第四步定快慢。</p>
+      <div class="foot"><span>这套四步是可复用的：换一个入口，动作不变，只换判据</span><span class="mono">v1.6.0</span></div>
+    </div>
+  </section>
+
+  <!-- 05 大象机器人三处 -->
+  <section class="slide" data-note="大象机器人这一步，只有三处落进页面：外形轴距、动作流程、命名面板。官网是参照，不是素材库。">
+    <div class="kicker">01 · 模式</div>
+    <div class="pgno mono">05 / 09</div>
+    <div class="rule"></div>
+    <div style="padding-top:2.2em">
+      <h2>大象机器人这一步，只有三处落进了页面</h2>
+      <p class="lead">官网能读的很多，落进三维场景的只有外形、动作、命名；其余参数只在讲方案时口头补。</p>
+      <div class="two">
+        <div>
+          <div class="blocks">
+            <div class="blk"><b>一 · 外形与轴距</b><p>车体比例、轮距、举升高度按产品页形态建模，不放大。</p></div>
+            <div class="blk"><b>二 · 动作与流程</b><p>到点 — 拍照 — 回传 — 告警，对应巡检路线与告警联动。</p></div>
+            <div class="blk"><b>三 · 命名与面板</b><p>型号、配件名、端侧系统名沿用官网叫法，不自造新词。</p></div>
+          </div>
+          <p class="quote" style="font-size:1.15em;margin-top:1.4em">官网是参照，不是素材库：能借的只有叫法与比例，判断还得自己做。</p>
+        </div>
+        <div class="fig"><img src="screenshots/02-recognize.png" alt="展示页巡检视图"/>
+          <div class="figcap">图 1 · 到点复核：车体、路线、识别记录（1600×900 实际截图）</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 06 三载体 -->
+  <section class="slide" data-note="同一套内容几个载体：官网页做门面并内嵌演示，展示页给人操作，下载包给断网教室，网页版 PPT 讲这套动作怎么复用。">
+    <div class="kicker">02 · 成品</div>
+    <div class="pgno mono">06 / 09</div>
+    <div class="rule"></div>
+    <div style="padding-top:2.2em">
+      <h2>同一套内容，几个载体，都能当场打开</h2>
+      <p class="lead">官网页做门面且内嵌演示，展示页给人操作，下载包给断网的教室，网页版 PPT 讲复用；几处说的是同一件事。</p>
+      <div class="tbl h3">
+        <div class="th">载体</div><div class="th">形态</div><div class="th">可核验的点</div>
+        <div class="td col1">官网页</div><div class="td mono">official.html</div>
+        <div class="td">内嵌展示页那块的 16:9 框能直接操作，下方另有「新窗口打开」兜底</div>
+        <div class="td col1">在线展示页</div><div class="td mono">index.html · Pages</div>
+        <div class="td">首页 200，2,437,653 字节，底栏「官方资料」「汇报材料」两块都能开</div>
+        <div class="td col1">本地演示包</div><div class="td mono">plant-factory-demo-1.6.0.zip</div>
+        <div class="td">1,104,614 字节，解压双击「启动演示.bat」，断网可跑</div>
+        <div class="td col1">网页版 PPT</div><div class="td mono">slides.html · 9 页</div>
+        <div class="td">不需要飞书，浏览器里直接投屏翻页；这个文件就是</div>
+      </div>
+      <p class="micro">几件同源：面板里加一条入口，官网页、展示页、下载包、这份 PPT 一起改。字节数为 2026-11-28 复核值。</p>
+    </div>
+  </section>
+
+  <!-- 07 效果①：两块面板 -->
+  <section class="slide" data-note="两块面板：官方资料给证据（七条目三块），汇报材料给模式、PPT 与截图，还带一个六页的演讲模式。">
+    <div class="kicker">03 · 效果</div>
+    <div class="pgno mono">07 / 09</div>
+    <div class="rule"></div>
+    <div style="padding-top:2.2em">
+      <h2>两块面板：一块给证据，一块给讲法</h2>
+      <p class="lead">底栏两个按钮，盖在三维场景上的一层，不跳页、不刷新；点遮罩或 Esc 就关掉。</p>
+      <div class="two">
+        <div class="fig"><img src="screenshots/06-official.png" alt="官方资料面板"/>
+          <div class="figcap">图 2 · 官方资料面板，7 个条目、3 块结构，1600×900 实际截图</div></div>
+        <div>
+          <div class="blocks">
+            <div class="blk"><b>01 设备与平台 · 五条入口</b><p>域名用等宽字右对齐，点开即走，不落到本页。</p></div>
+            <div class="blk"><b>02 本项目成果 · 页面与下载包</b><p>都挂真实地址，能当场下。</p></div>
+            <div class="blk"><b>03 关于 AI 辅助 · 三句话</b><p>同一个 AI，不同人用出来不一样：判断在提示词里。</p></div>
+            <div class="blk"><b>汇报材料 · 三页讲解器</b><p>模式四步可点选、PPT 页序对照、效果三图带「证明什么」；另有一键全屏、六页大字的演讲模式。</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 08 效果②：线上实测 -->
+  <section class="slide" data-note="线上实测：首页 200、包能下、面板 0 报错。数字由浏览器自报，不写死。">
+    <div class="kicker">03 · 效果</div>
+    <div class="pgno mono">08 / 09</div>
+    <div class="rule"></div>
+    <div style="padding-top:2.2em">
+      <h2>线上已跑通：首页 200、包能下、面板 0 报错</h2>
+      <p class="lead">2026-11-28 复核，请求线上地址实测，不用「已上线」四个字代替。</p>
+      <div class="two">
+        <div class="fig"><img src="screenshots/03-scene-editor.png" alt="场景编辑面板"/>
+          <div class="figcap">图 3 · 场景编辑：架体、配件、模板一屏可调（1600×900 实际截图）</div></div>
+        <div>
+          <div class="kv">
+            <div class="row"><b class="mono">2,437,653 字节</b><p>index.html 首页响应，含内嵌 three.js 与两组截图</p></div>
+            <div class="row"><b class="mono">1,104,614 字节</b><p>演示包 v1.6.0，解压双击「启动演示.bat」即用</p></div>
+            <div class="row"><b>2 块面板 · 0 报错</b><p>两块面板打开后计数：条目 7、截图 3、控制台报错 0</p></div>
+          </div>
+          <p class="micro">复核方式：playwright-core 驱动 Edge，1600×900，请求线上地址后点开面板取值。</p>
+        </div>
+      </div>
+      <div class="foot"><span class="mono">medianigray.github.io/plant-factory-inspection-demo</span><span class="mono">08 / 09</span></div>
+    </div>
+  </section>
+
+  <!-- 09 边界 -->
+  <section class="slide" data-note="收尾：哪些是真的、哪些是模拟写清楚，别人才知道这套东西能不能搬走、搬走要改哪几处。">
+    <div class="kicker">边界 · 下一步</div>
+    <div class="pgno mono">09 / 09</div>
+    <div class="rule"></div>
+    <div style="padding-top:2.2em">
+      <h2>哪些是真的、哪些是模拟，写清楚再收尾</h2>
+      <p class="lead">边界写明白了，别人才知道这套东西能不能直接搬走、搬走要改哪几处。</p>
+      <div class="lists">
+        <div><b>已经成立</b>
+          <ul>
+            <li>页面、面板、下载包都在线上，可当场打开</li>
+            <li>五个入口逐一对应，域名与视频链接可核对</li>
+            <li>三维场景、十类配件、告警联动由提示词驱动完成</li>
+            <li>四步处理法是走完的，不是总结出来的</li>
+          </ul>
+        </div>
+        <div><b>仍是模拟</b>
+          <ul>
+            <li>巡检路线与告警是脚本演示，没接真机</li>
+            <li>环境数值与置信度为模拟值，不代表实测</li>
+            <li>现场光照与布局按照片近似，不是测绘</li>
+            <li>本页不是 Gazebo 仿真：仿真走 ROS2 + Gazebo</li>
+          </ul>
+        </div>
+      </div>
+      <p class="quote" style="margin-top:1.2em">AI 把页面做出来，判断和验收还是自己的活。</p>
+      <div class="foot"><span>展示页 v1.6.0 · 覃祖悦 · 网络工程技术（本）2502 · 2026-11-28</span><span class="mono">09 / 09</span></div>
+    </div>
+  </section>
+
+</div>
+
+<div class="note" id="note"><b>讲稿</b><p id="note-txt"></p></div>
+
+<div class="ui" id="ui">
+  <button id="prev">← 上一页</button>
+  <button id="next">下一页 →</button>
+  <div class="dots" id="dots"></div>
+  <div class="num mono"><b id="cur">1</b> / 9</div>
+  <button id="btn-note">讲稿 N</button>
+  <button id="btn-full">全屏 F</button>
+  <button id="btn-site">官网</button>
+  <button id="btn-demo">展示页</button>
+</div>
+
+<script>
+(function () {
+  const slides = [...document.querySelectorAll('.slide')];
+  const dots = document.getElementById('dots');
+  let i = 0;
+
+  slides.forEach((s, n) => {
+    const d = document.createElement('i');
+    d.onclick = () => go(n);
+    dots.appendChild(d);
+  });
+
+  function paint() {
+    slides.forEach((s, n) => s.classList.toggle('on', n === i));
+    [...dots.children].forEach((d, n) => d.classList.toggle('on', n === i));
+    document.getElementById('cur').textContent = i + 1;
+    document.getElementById('note-txt').textContent = slides[i].dataset.note || '';
+  }
+  function go(n) {
+    if (n < 0 || n >= slides.length) return;
+    i = n; paint();
+    history.replaceState(null, '', '#' + (i + 1));
+  }
+  const next = () => go(i + 1);
+  const prev = () => go(i - 1);
+
+  document.getElementById('next').onclick = next;
+  document.getElementById('prev').onclick = prev;
+  document.getElementById('btn-site').onclick = () => { location.href = 'official.html'; };
+  document.getElementById('btn-demo').onclick = () => { window.open('index.html', '_blank'); };
+  document.getElementById('btn-note').onclick = () => document.getElementById('note').classList.toggle('on');
+  document.getElementById('btn-full').onclick = () => {
+    if (document.fullscreenElement) document.exitFullscreen();
+    else document.documentElement.requestFullscreen();
+  };
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ' || e.key === 'PageDown') { next(); e.preventDefault(); }
+    else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp' || e.key === 'PageUp') { prev(); e.preventDefault(); }
+    else if (e.key === 'Home') go(0);
+    else if (e.key === 'End') go(slides.length - 1);
+    else if (e.key === 'f' || e.key === 'F') document.getElementById('btn-full').click();
+    else if (e.key === 'n' || e.key === 'N') document.getElementById('note').classList.toggle('on');
+  });
+
+  /* 触屏与点击翻页：右侧三分之二下一页，左侧三分之一上一页 */
+  document.getElementById('deck').addEventListener('click', (e) => {
+    if (e.target.closest('.ui, .note')) return;
+    (e.clientX > window.innerWidth * 0.34) ? next() : prev();
+  });
+  let sx = null;
+  document.addEventListener('touchstart', (e) => { sx = e.touches[0].clientX; }, { passive: true });
+  document.addEventListener('touchend', (e) => {
+    if (sx === null) return;
+    const dx = e.changedTouches[0].clientX - sx;
+    if (Math.abs(dx) > 50) dx < 0 ? next() : prev();
+    sx = null;
+  }, { passive: true });
+
+  /* 控制条自动淡出 */
+  let hideT = null;
+  const ui = document.getElementById('ui');
+  const wake = () => { ui.classList.remove('hide'); clearTimeout(hideT); hideT = setTimeout(() => ui.classList.add('hide'), 2600); };
+  ['mousemove', 'keydown', 'touchstart'].forEach((ev) => document.addEventListener(ev, wake, { passive: true }));
+  wake();
+
+  const h = parseInt((location.hash || '#1').slice(1), 10);
+  if (h >= 1 && h <= slides.length) i = h - 1;
+  paint();
+})();
+</script>
+</body>
+</html>
