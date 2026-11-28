@@ -884,7 +884,7 @@
     try{
       var res=performance.getEntriesByType('resource').filter(function(e){ return /index\.html/.test(e.name); });
       var last=res[res.length-1];
-      if(last) bytes=last.encodedBodySize||last.transferSize||0;
+      if(last) bytes=last.decodedBodySize||last.encodedBodySize||last.transferSize||0;
     }catch(e){}
     if(tLoad && t0) ms=Math.round(tLoad-t0);
     if(!bytes && !ms) return;
