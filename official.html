@@ -68,7 +68,7 @@
   .hero .acts{margin-top:28px;display:flex;gap:12px;flex-wrap:wrap;}
   .hero .note{margin-top:16px;font-size:10.5px;color:var(--dim);letter-spacing:.5px;}
   .shot-frame{position:relative;border:1px solid var(--line);background:var(--panel);padding:8px;}
-  .shot-frame img{display:block;width:100%;height:auto;}
+  .shot-frame img{display:block;width:100%;height:auto;max-height:560px;object-fit:cover;object-position:center 62%;}
   .shot-frame span{position:absolute;left:8px;bottom:10px;font-size:9.5px;letter-spacing:1px;color:#cfe0f2;
     background:rgba(5,8,15,.78);border:1px solid var(--line);padding:4px 8px;}
 
@@ -127,6 +127,16 @@
   .step b{display:block;margin:8px 0 6px;font-size:13px;}
   .step p{font-size:10.5px;line-height:1.8;color:var(--dim);}
 
+  /* 现场与设备 */
+  .gal{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+  .gal figure{margin:0;border:1px solid var(--line2);padding:8px;background:var(--panel);}
+  .gal img{display:block;width:100%;height:300px;object-fit:cover;object-position:center 45%;}
+  .gal figcaption{margin-top:8px;font-size:10px;line-height:1.8;color:var(--dim);}
+  .equip{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;margin-top:20px;}
+  .equip .e{border-top:1px solid var(--line2);padding-top:10px;}
+  .equip .e b{display:block;font-size:10.5px;letter-spacing:1.5px;color:var(--cyan);margin-bottom:5px;}
+  .equip .e p{font-size:11px;line-height:1.9;color:var(--ink2);}
+
   /* 五层 */
   .arch{display:grid;grid-template-columns:180px 1fr;gap:1px;background:var(--line2);border:1px solid var(--line2);}
   .arch .k{background:var(--panel);padding:16px 18px;font-size:12px;color:#cfe0f2;letter-spacing:1px;}
@@ -182,6 +192,8 @@
     .stats .row{grid-template-columns:repeat(2,1fr);}
     .stats .cell:nth-child(odd){padding-left:0;border-left:none;}
     .gap-grid{grid-template-columns:1fr;}
+    .gal{grid-template-columns:1fr;}
+    .gal img{height:240px;}
     .steps{grid-template-columns:repeat(3,1fr);}
     .res-grid{grid-template-columns:1fr;}
     .refs{grid-template-columns:repeat(2,1fr);}
@@ -213,6 +225,7 @@
     </a>
     <nav>
       <a href="#gaps">方案</a>
+      <a href="#site">现场</a>
       <a href="#demo">在线演示</a>
       <a href="#flow">巡检流程</a>
       <a href="#arch">技术底座</a>
@@ -243,8 +256,8 @@
         <p class="note">本地包解压双击「启动演示.bat」，断网也能跑；页面与本地包是同一份东西。</p>
       </div>
       <div class="shot-frame reveal">
-        <img src="screenshots/01-overview.png" alt="展示页全景：三层架体、固定监测点位与巡检车"/>
-        <span>展示页全景 · 1600×900 实际截图</span>
+        <img src="screenshots/12-lab-greenhouse.jpg" alt="数字农业创新实训中心（1）现场：温室模组与控制柜"/>
+        <span>实训室现场 · 数字农业创新实训中心（1）· 实拍原图</span>
       </div>
     </div>
   </section>
@@ -286,11 +299,36 @@
     </div>
   </section>
 
+  <section id="site">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="sec-no">02</span>
+        <h2>现场与设备：照片是真的，设备名也是真的</h2>
+        <span class="hint">数字农业创新实训中心（1）· 2026.03 建成 · 95㎡ · 投入约 132 万</span>
+      </div>
+      <div class="gal reveal">
+        <figure><img src="screenshots/12-lab-greenhouse.jpg" alt="温室模组与控制柜现场"/><figcaption>温室模组与控制柜：多层立体栽培架、环控柜同处一室</figcaption></figure>
+        <figure><img src="screenshots/13-lab-cabinet.jpg" alt="温室大棚采集控制系统面板"/><figcaption>控制柜面板：风机、湿帘水泵、植物补光灯、遮阳铺、顶开窗，各有运行灯与手自动切换</figcaption></figure>
+        <figure><img src="screenshots/14-lab-ferti.jpg" alt="智能水肥一体机"/><figcaption>智能水肥一体机：触摸屏 + 变频器，HMI 画面可在平台里同步操作</figcaption></figure>
+      </div>
+
+      <div class="equip reveal">
+        <div class="e"><b>环境采集</b><p>百叶箱（CO₂ / 空气温度 / 空气湿度 / 光照四项合一）、光合有效传感器（PAR）</p></div>
+        <div class="e"><b>水质与营养液</b><p>pH 复合电极、EC 电导率传感器（μS/cm）、进水流量计、蠕动泵定量投加</p></div>
+        <div class="e"><b>执行机构</b><p>循环泵、搅拌泵、水肥一体机（支持 HMI 画面远程同步）、风机、湿帘水泵、补光灯、遮阳、顶开窗</p></div>
+        <div class="e"><b>告警与网络</b><p>声光报警器（阈值越限自动触发）、臭氧传感器、4G DTU 上行、PLC 总控柜</p></div>
+        <div class="e"><b>视频</b><p>萤石云接入，最多 9 路分屏（1 / 3 / 9），实测延时 500ms 以内；支持定时抓拍</p></div>
+        <div class="e"><b>平台侧已有</b><p>物模型、设备日志、数据分析报表、场景联动、告警分级（提醒 → 需现场处理）、蔬菜长势与鱼情识别</p></div>
+      </div>
+      <p class="gap-foot">这些名字和阈值不是编的，来自实训室《用户操作手册（简化版）》与实训室介绍。页面里只做了两件它们做不到的事：把告警翻译成一次「到点确认」的派单，以及把那一眼的结果写成结构化记录。设备控制权仍在原有 PLC 与场景联动里，演示页不接管。</p>
+    </div>
+  </section>
+
   <section id="demo">
     <div class="wrap">
       <div class="demo-head">
         <div class="txt">
-          <div class="sec-no">02 · 在线演示</div>
+          <div class="sec-no">03 · 在线演示</div>
           <h2>这一页里直接跑，不用跳走</h2>
           <p>下面这块就是展示页本体：固定告警、派单、导航、到点拍照、记录生成、人工确认，六步都能自己点。鼠标左键拖拽旋转，滚轮缩放，右键平移；「编辑场景」可改行列层与配件。</p>
         </div>
@@ -325,7 +363,7 @@
   <section id="flow">
     <div class="wrap">
       <div class="sec-head">
-        <span class="sec-no">03</span>
+        <span class="sec-no">04</span>
         <h2>一次巡检，六步走完</h2>
         <span class="hint">机器做前五步，第六步留给人</span>
       </div>
@@ -343,7 +381,7 @@
   <section id="arch">
     <div class="wrap">
       <div class="sec-head">
-        <span class="sec-no">04</span>
+        <span class="sec-no">05</span>
         <h2>五层架构，哪里是新增的</h2>
         <span class="hint">平台层沿用实训室已有能力，新增集中在智能体层</span>
       </div>
@@ -365,7 +403,7 @@
   <section id="res">
     <div class="wrap">
       <div class="sec-head">
-        <span class="sec-no">05</span>
+        <span class="sec-no">06</span>
         <h2>几个载体，一份内容</h2>
         <span class="hint">课堂用在线页，断网用本地包，讲复用用网页版 PPT</span>
       </div>
@@ -413,7 +451,7 @@
   <section id="take">
     <div class="wrap">
       <div class="sec-head">
-        <span class="sec-no">06</span>
+        <span class="sec-no">07</span>
         <h2>每个入口取了什么、明确没取什么</h2>
         <span class="hint">能借的是叫法与比例，判断得自己做</span>
       </div>
@@ -430,6 +468,9 @@
         <div class="row"><div class="who">视频号（一）·（二）</div>
           <div class="got">取：到点、停车、拍照、回传的真实节奏与车体行进姿态</div>
           <div class="not">不取：拍摄花絮与场地布置——要的是流程，不是观感</div></div>
+        <div class="row"><div class="who">校本材料</div>
+          <div class="got">取：设备名（百叶箱、光合有效、EC / pH、蠕动泵、水肥一体机、PLC 柜）、告警分级（提醒 → 需现场处理）、场景联动口径、9 路分屏与 500ms 延时这类现成指标</div>
+          <div class="not">不取：平台账号、内部截图、运维口令——材料里有，但不能贴到公开页上</div></div>
         <div class="row"><div class="who">老师给的展示页</div>
           <div class="got">取：六节结构（主张 — 盲区 — 演示 — 流程 — 架构 — 边界）</div>
           <div class="not">不取：对方的具体文案——结构可以借，话得自己写</div></div>
@@ -456,7 +497,7 @@
   <section id="bound">
     <div class="wrap">
       <div class="sec-head">
-        <span class="sec-no">07</span>
+        <span class="sec-no">08</span>
         <h2>边界与下一步</h2>
         <span class="hint">说清楚哪些是真的，哪些还是模拟</span>
       </div>
@@ -465,6 +506,7 @@
           <b>现在是真的</b>
           <ul>
             <li>页面能跑、能操作，断网也能开</li>
+            <li>现场照片是本机实拍，设备名与告警分级取自实训室手册，可逐条对照</li>
             <li>场景参数化：行列层、株数、节点、配件、告警点位可改</li>
             <li>场景配置能导出 JSON，换机器复现同一场景</li>
             <li>两块面板与九页 PPT 说同一套动作</li>
@@ -473,6 +515,7 @@
         <div class="box">
           <b>现在仍是模拟</b>
           <ul>
+            <li>巡检车与路线是三维演示，未接实训室真车</li>
             <li>温湿度、PAR、CO₂、EC、覆盖度、置信度为模拟值</li>
             <li>识别结果是示意，不是实训室实测</li>
             <li>本页不是 Gazebo 仿真：仿真验证走 ROS2 + Gazebo</li>
@@ -488,7 +531,7 @@
       <div class="l">
         <b>数智植物工厂 · 固定监测 ＋ 移动复核 智能巡检</b>
         <p>广西农业职业技术大学 信息工程学院 · 网络工程技术（本）2502 · 覃祖悦<br/>
-           课程汇报材料，2026 年 11 月；页面、下载包、PPT 三处同源。</p>
+           课程汇报材料，2026 年 11 月；官网页、展示页、下载包、网页版 PPT 同源，现场照片为实训室实拍。</p>
       </div>
       <div class="r">
         <span id="foot-ver">站点版本 v1.6.0</span><br/>
