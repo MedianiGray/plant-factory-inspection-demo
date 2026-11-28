@@ -16,7 +16,7 @@
     /* 一套 4 档间距 */
     --s1:10px; --s2:18px; --s3:34px; --s4:64px; --s5:96px;
     /* 一套颜色：1 主色 + 3 中性 */
-    --bg:#ffffff; --surface:#fafbfd; --ink:#0c1626; --ink2:#47586f; --dim:#8b98aa;
+    --bg:#ffffff; --surface:#fafbfd; --ink:#0c1626; --ink2:#47586f; --dim:#77869b;
     --line:#e6ebf2; --line2:#f1f4f9; --accent:#1257d8; --accent-soft:#eef3ff;
     --ok:#0f7a56; --amber:#a86a14;
     /* 一套圆角与阴影：只在两处用 */
@@ -70,6 +70,13 @@
   .hero .acts{margin-top:28px;display:flex;gap:12px;flex-wrap:wrap;align-items:center;}
   .hero .meta{margin-top:24px;display:flex;gap:22px;flex-wrap:wrap;font-size:11.5px;color:var(--dim);}
   .hero .meta b{color:var(--ink);font-size:12px;margin-right:5px;}
+  .idx{margin-top:30px;padding-top:12px;border-top:1px solid var(--line);
+    display:grid;grid-template-columns:repeat(3,1fr);gap:0 26px;max-width:560px;}
+  .idx a{display:flex;align-items:baseline;gap:11px;padding:8px 0;border-bottom:1px solid var(--line2);
+    font-size:12.5px;color:var(--ink2);transition:color .18s;}
+  .idx a:hover{color:var(--accent);}
+  .idx a i{font-style:normal;font-family:Consolas,monospace;font-size:10px;letter-spacing:1.2px;color:var(--dim);}
+  .idx a:hover i{color:var(--accent);}
 
   /* ── 点位图：全站唯一的图形语言（点阵 + 扫描线） ── */
 
@@ -150,9 +157,10 @@
   .spec td.k{color:var(--ink);font-weight:600;width:19%;}
   .spec td.v{width:37%;font-family:Consolas,"Microsoft YaHei",monospace;color:var(--ink);font-size:12.5px;}
   .spec td.s{width:44%;font-size:11.5px;color:var(--dim);}
-  .take td.w{width:14%;color:var(--ink);font-weight:600;}
-  .take td.a{width:43%;}
-  .take td.b{width:43%;color:var(--dim);}
+  .take td.w{width:15%;color:var(--ink);font-weight:600;}
+  .take td.a{width:44%;}
+  .take td.b{width:41%;color:var(--dim);}
+  .take td{padding:18px 14px;}
 
   /* ── 06 五层：细线行 ── */
   .layers{border-top:1px solid var(--ink);}
@@ -321,6 +329,7 @@
     /* 抬头那行在窄屏只占一行，别把 VERIFY 掉到第二行 */
     .eyebrow{font-size:8px;letter-spacing:1.1px;white-space:nowrap;}
     .hero .acts{gap:8px;}
+    .idx{grid-template-columns:1fr 1fr;gap:0 20px;max-width:none;}
     .hero .acts .btn{font-size:12px;padding:0 12px;height:38px;}
     .hero .acts .btn,.hero .acts .link{width:auto;}
     .band b{font-size:30px;}
@@ -359,7 +368,7 @@
   @media print{
     @page{size:A4 portrait;margin:16mm 14mm;}
     html,body{background:#fff;}
-    header,.demo-tools,.fallback,.stage,#move .note{display:none!important;}
+    header,.demo-tools,.fallback,.stage,#move .note,.idx{display:none!important;}
     .wrap{max-width:none;padding:0;}
     .hero{padding:0 0 6mm;}
     .hero .grid{grid-template-columns:1fr;}
@@ -470,6 +479,18 @@
         <div class="meta">
           <span><b>15</b> 固定点位</span><span><b>1</b> 台移动车</span><span><b>6</b> 步闭环</span><span><b>0</b> 外部依赖</span>
         </div>
+        <nav class="idx" aria-label="本页十节">
+          <a href="#gaps"><i>01</i><span>三个缺口</span></a>
+          <a href="#role"><i>02</i><span>做与不做</span></a>
+          <a href="#demo"><i>03</i><span>在线演示</span></a>
+          <a href="#flow"><i>04</i><span>六步闭环</span></a>
+          <a href="#spec"><i>05</i><span>参数与出处</span></a>
+          <a href="#stack"><i>06</i><span>五层底座</span></a>
+          <a href="#res"><i>07</i><span>四个载体</span></a>
+          <a href="#move"><i>08</i><span>怎么搬</span></a>
+          <a href="#take"><i>09</i><span>取与不取</span></a>
+          <a href="#bound"><i>10</i><span>边界</span></a>
+        </nav>
       </div>
       <figure class="boards">
         <div class="board back">
@@ -749,6 +770,7 @@
           <tr><td class="w">现场</td><td class="a">只取事实：95 ㎡、2026.03 建成、约 132 万元、控制柜上的型号与面板功能</td><td class="b">现场照片不上页面——官网门面用示意图，照片留给汇报与答辩</td></tr>
         </tbody>
       </table>
+      <p class="note" style="margin-top:22px;max-width:900px">一句话：取的是讲法与顺序，不取的是素材、数据与图。每处引用都在第 5 节参数表里标了出处，可逐行核对。</p>
     </div>
   </section>
 
