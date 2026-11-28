@@ -4,7 +4,14 @@
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>数智植物工厂 · 固定监测 ＋ 移动复核 智能巡检</title>
-<meta name="description" content="高架叶菜植物工厂的巡检方案：固定监测打底，一台移动车补上到点确认这一环。在线演示可直接操作。"/>
+<meta name="description" content="高架叶菜植物工厂的巡检方案：固定监测打底，一台移动车补上到点确认这一环。在线演示可直接操作，页面里内嵌完整演示。"/>
+<meta name="theme-color" content="#05080f"/>
+<meta property="og:type" content="website"/>
+<meta property="og:title" content="数智植物工厂 · 固定监测 ＋ 移动复核 智能巡检"/>
+<meta property="og:description" content="固定监测打底，一台移动车补上到点确认这一环。六个入口取与不取都写清楚了，演示在页面里直接跑。"/>
+<meta property="og:image" content="screenshots/08-official-page.png"/>
+<meta name="twitter:card" content="summary_large_image"/>
+<link rel="canonical" href="https://medianigray.github.io/plant-factory-inspection-demo/official.html"/>
 <style>
   :root{
     --bg:#05080f; --bg2:#080e1a; --panel:#0a1322; --line:rgba(70,120,180,.26);
@@ -140,6 +147,19 @@
   .ref b{display:block;font-size:11.5px;color:#dfeaf5;margin-bottom:4px;}
   .ref span{font-size:9.5px;color:var(--dim);}
 
+  /* 取与不取 */
+  .take{display:grid;gap:1px;background:var(--line2);border:1px solid var(--line2);}
+  .take .row{display:grid;grid-template-columns:170px 1fr 1fr;gap:1px;background:var(--line2);}
+  .take .who{background:var(--panel);padding:14px 16px;font-size:11.5px;color:#dfeaf5;letter-spacing:1px;}
+  .take .got{background:var(--bg2);padding:14px 16px;font-size:11px;line-height:1.85;color:#cfe0f2;}
+  .take .not{background:var(--bg2);padding:14px 16px;font-size:11px;line-height:1.85;color:var(--dim);}
+  .dl{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin-top:22px;}
+  .dl .card{border:1px solid var(--line2);padding:16px 18px 18px;background:linear-gradient(180deg,rgba(63,182,232,.04),transparent 70%);}
+  .dl .card b{display:block;font-size:12.5px;}
+  .dl .card i{font-style:normal;display:block;margin:6px 0 10px;font-size:9.5px;letter-spacing:1px;color:var(--dim);font-family:Consolas,monospace;}
+  .dl .card p{font-size:11px;line-height:1.9;color:var(--ink2);min-height:62px;}
+  .dl .card .btn{margin-top:10px;}
+
   /* 边界 */
   .bound{display:grid;grid-template-columns:1fr 1fr;gap:26px;}
   .bound .box{border:1px solid var(--line2);padding:18px 20px;}
@@ -166,6 +186,7 @@
     .res-grid{grid-template-columns:1fr;}
     .refs{grid-template-columns:repeat(2,1fr);}
     .bound{grid-template-columns:1fr;}
+    .take .row{grid-template-columns:1fr;}
     .arch{grid-template-columns:1fr;}
     .arch .k{border-bottom:1px solid var(--line2);}
   }
@@ -196,6 +217,7 @@
       <a href="#flow">巡检流程</a>
       <a href="#arch">技术底座</a>
       <a href="#res">资料与出处</a>
+      <a href="#take">取与不取</a>
       <a href="slides.html" target="_blank" rel="noopener">PPT</a>
     </nav>
     <div class="cta">
@@ -388,10 +410,53 @@
     </div>
   </section>
 
-  <section id="bound">
+  <section id="take">
     <div class="wrap">
       <div class="sec-head">
         <span class="sec-no">06</span>
+        <h2>每个入口取了什么、明确没取什么</h2>
+        <span class="hint">能借的是叫法与比例，判断得自己做</span>
+      </div>
+      <div class="take reveal">
+        <div class="row"><div class="who">大象机器人</div>
+          <div class="got">取：车体外形比例、轴距、举升高度，到点—拍照—回传的动作顺序，型号与配件叫法</div>
+          <div class="not">不取：负载、续航、关节精度这些商品参数——本方案不载重、不越障，抄进来只会被追问「用在哪」</div></div>
+        <div class="row"><div class="who">OpenHarmony</div>
+          <div class="got">取：设备侧分层（终端 — 边缘 — 云）、分布式软总线的角色划分</div>
+          <div class="not">不取：开发板型号与 SDK 细节——本方案没有真机接入，写型号等于虚报</div></div>
+        <div class="row"><div class="who">开鸿 Kaihong</div>
+          <div class="got">取：信创环境下「国产系统 + 边缘盒」的落地路径，写进架构那一段的参照</div>
+          <div class="not">不取：具体项目案例与合同口径——那是企业侧资料，不该由学生转述</div></div>
+        <div class="row"><div class="who">视频号（一）·（二）</div>
+          <div class="got">取：到点、停车、拍照、回传的真实节奏与车体行进姿态</div>
+          <div class="not">不取：拍摄花絮与场地布置——要的是流程，不是观感</div></div>
+        <div class="row"><div class="who">老师给的展示页</div>
+          <div class="got">取：六节结构（主张 — 盲区 — 演示 — 流程 — 架构 — 边界）</div>
+          <div class="not">不取：对方的具体文案——结构可以借，话得自己写</div></div>
+        <div class="row"><div class="who">AI 辅助</div>
+          <div class="got">取：界面与三维场景的实现速度、模板化的排版</div>
+          <div class="not">不取：判断与验收——判断错了，AI 只会把错的东西做得更漂亮</div></div>
+      </div>
+
+      <div class="dl reveal">
+        <div class="card"><b>本地演示包</b><i>1,104,833 字节 · v1.6.0</i>
+          <p>解压双击「启动演示.bat」，没有网络也能跑完整六步。</p>
+          <a class="btn" href="download/plant-factory-demo-1.6.0.zip">下载 zip ↓</a></div>
+        <div class="card"><b>网页版 PPT</b><i>slides.html · 九页</i>
+          <p>投屏翻页，<span class="mono">← →</span> 翻页、<span class="mono">F</span> 全屏、<span class="mono">N</span> 看讲稿；也可直接打印成九页 A4 横版。</p>
+          <a class="btn" href="slides.html" target="_blank" rel="noopener">打开 ↗</a></div>
+        <div class="card"><b>场景模板</b><i>不另发文件</i>
+          <p>模板跟着页面走：演示页「编辑场景 → 导出 JSON」，导出的就是当前这一版；另发一份静态模板迟早会和页面对不上。</p>
+          <a class="btn" href="index.html" target="_blank" rel="noopener">去导出 ↗</a></div>
+      </div>
+      <p class="gap-foot">整站零外部依赖：渲染库、字体、截图全部在文件里，断网、拷 U 盘、内网投屏都照原样显示；这也是为什么它敢写「下载包里跑的就是这一份」。</p>
+    </div>
+  </section>
+
+  <section id="bound">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="sec-no">07</span>
         <h2>边界与下一步</h2>
         <span class="hint">说清楚哪些是真的，哪些还是模拟</span>
       </div>
