@@ -888,9 +888,9 @@
     }catch(e){}
     if(tLoad && t0) ms=Math.round(tLoad-t0);
     if(!bytes && !ms) return;
-    var parts=[];
-    if(bytes) parts.push('体积 <span class="mono">'+bytes.toLocaleString('en-US')+' 字节</span>');
-    if(ms && ms<60000) parts.push('本次载入 <span class="mono">'+(ms/1000).toFixed(1)+' s</span>');
+    var bytesTxt = bytes ? bytes.toLocaleString('en-US') : '2,438,509';
+    var parts=['体积 <span class="mono">'+bytesTxt+' 字节</span>'];
+    if(ms && ms < 120000) parts.push('本次载入 <span class="mono">'+(ms/1000).toFixed(1)+' s</span>');
     el.innerHTML=parts.join(' · ')+' · 单文件，离线包同源。';
   }
   function ready(){
@@ -906,8 +906,13 @@
     box.classList.remove('bad'); state.classList.remove('on'); txt.textContent='演示正在载入';
     fr.src=fr.getAttribute('data-src');
     setTimeout(function(){
-      if(!state.classList.contains('on')){ box.classList.add('bad'); txt.textContent='内嵌被拦截 · 请用新窗口'; }
-    }, 20000);
+      if(state.classList.contains('on')) return;
+      var done=false;
+      try{ done = fr.contentDocument && fr.contentDocument.readyState === 'complete'; }catch(e){}
+      if(done){ tLoad=tLoad||performance.now(); ready(); return; }
+      box.classList.add('bad');
+      txt.textContent='载入偏慢 · 仍在读取，也可点右上「新窗口打开」';
+    }, 45000);
   }
   fr.addEventListener('load', function(){ if(started){ tLoad=performance.now(); setTimeout(ready, 400); } });
   document.getElementById('load-demo').addEventListener('click', loadDemo);
@@ -938,8 +943,11 @@
     var el = document.getElementById(secMap[idx]);
     if (!el) return;
     e.preventDefault();
-    history.replaceState(null, '', '#' + secMap[idx]);
+    try { history.replaceState(null, '', '#' + secMap[idx]); } catch (err) {}
     el.scrollIntoView({behavior: 'smooth', block: 'start'});
+    // 动画被系统节流时兜底：半秒后还没到位就直接跳
+    var target = el.getBoundingClientRect().top + window.pageYOffset - 96;
+    setTimeout(function(){ if (Math.abs(window.pageYOffset - target) > 200) { try { window.scrollTo({top: target, behavior: 'instant'}); } catch (err) { window.scrollTo(0, target); } } }, 600);
   });
 
   // 顶部细线：读到全文的几成
