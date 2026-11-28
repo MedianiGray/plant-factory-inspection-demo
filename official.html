@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8"/>
@@ -89,7 +89,9 @@
     margin-bottom:40px;}
   .sec-no{display:block;font-size:10px;letter-spacing:1.8px;color:var(--dim);font-family:Consolas,monospace;margin-bottom:9px;}
   .sec-head h2{font-size:27px;line-height:1.4;letter-spacing:.6px;}
-  .sec-head .hint{display:none;}      /* 注释性小字一律不上页，克制 */
+  .sec-head .hint{display:none;}
+  .print-only{display:none;}      /* 注释性小字一律不上页，克制 */
+  .print-only{display:none;}
   .lede{font-size:15px;line-height:1.95;color:var(--ink2);max-width:760px;}
   .note{font-size:11.5px;line-height:1.9;color:var(--dim);}
   .q{border-left:1px solid var(--accent);padding:2px 0 2px 22px;font-size:17.5px;line-height:1.8;color:var(--ink);max-width:900px;}
@@ -379,6 +381,44 @@
     .print-head .k{font-family:Consolas,monospace;font-size:7.5pt;letter-spacing:1.5pt;color:#666;}
     .print-head b{display:block;font-size:16pt;margin:2mm 0 1.5mm;}
     .print-head p{font-size:8pt;color:#555;}
+
+    /* A4 正文宽 ≈182mm ≈ 688px，会命中上面的 ≤720px 窄屏规则；
+       打印里把表格与栅格显式恢复成桌面形态，否则表格会被拆成竖排卡片。 */
+    .spec thead,.take thead{display:table-header-group;}
+    .spec tr,.take tr{display:table-row;padding:0;border-bottom:none;}
+    .spec td,.take td{display:table-cell;width:auto!important;margin:0;border:none;
+      border-bottom:.4pt solid #ddd;padding:1.8mm 2mm;vertical-align:top;}
+    .spec td.k{width:20%;} .spec td.v{width:36%;} .spec td.s{width:44%;}
+    .spec td.k,.spec td.v,.spec td.s,.take td.w,.take td.a,.take td.b{font-size:8pt;font-weight:400;color:#333;}
+    .spec td.k,.take td.w{font-weight:700;color:#000;}
+    .spec td.v{font-family:Consolas,"Microsoft YaHei",monospace;color:#000;}
+    .spec td.s,.take td.b{color:#555;}
+    .take td.b:before{content:none;}
+    .spec thead th,.take thead th{color:#777;font-weight:400;border-bottom:.8pt solid #999;}
+
+    .steps{grid-template-columns:1fr 1fr;}
+    .step{border:none;border-top:.4pt solid #ccc;padding:3mm 0 0;}
+    .res{grid-template-columns:1fr 1fr;gap:4mm;}
+    .refs .list{grid-template-columns:1fr;}
+    .sec-head{page-break-after:avoid;break-after:avoid;}
+
+    /* 参数表整块不跨页；专印视图只留它，自然占满一页 A4 */
+    .spec,.take{page-break-inside:avoid;break-inside:avoid;}
+
+    /* 别把节标题落在页脚、把正文甩到下一页 */
+    .dodont,.steps,.layer,.take,.spec{page-break-before:avoid;break-before:avoid;}
+    .sec-head{page-break-inside:avoid;break-inside:avoid;}
+    #demo{page-break-inside:avoid;break-inside:avoid;}
+    #demo .print-only{display:block;font-size:9pt;line-height:1.75;color:#555;max-width:none;margin:0;}
+    /* 表格行不跨页切断 */
+    .spec tr,.take tr{page-break-inside:avoid;break-inside:avoid;}
+    /* 末页收紧，署名不要被切到下一页 */
+    #take td{padding:1.3mm 2mm;}
+    #bound{padding-bottom:0;}
+    .bound li{padding:1.6mm 0;}
+    footer{page-break-inside:avoid;break-inside:avoid;margin-top:5mm;padding-top:4mm;}
+    /* 末节与署名同页收尾，不单留一行署名页 */
+    #bound{page-break-before:always;break-before:page;}
   }
 </style>
 </head>
@@ -514,6 +554,7 @@
         <h2>在线演示</h2>
         <span class="hint">这一块是页面本身<br/>不是视频，也不是截图</span>
       </div>
+      <p class="print-only">这一节是可直接操作的三维巡检页面，纸面不复现其画面。要现场演示，打开 medianigray.github.io/plant-factory-inspection-demo/index.html 即可（单文件，离线包同源）。</p>
       <div class="demo-tools">
         <div class="state" id="state"><s></s><span id="state-txt">演示未载入 · 滚到本节自动开始</span></div>
         <a class="btn s" href="index.html" target="_blank" rel="noopener" style="margin-left:auto">全屏演示 ↗</a>
