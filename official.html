@@ -308,7 +308,13 @@
     body{font-size:14.5px;}
     .wrap{padding:0 22px;}
     .nav nav{display:none;}
-    .nav{height:64px;}
+    .nav{height:64px;gap:14px;}
+    .brand i{display:none;}
+    .nav .right{gap:10px;}
+    .nav .right .clock{display:none;}
+    .nav .right .btn{height:34px;padding:0 12px;font-size:12px;}
+    .foot .r{text-align:left;margin-top:16px;}
+    .boards::before{left:0;right:0;}
     .hero h1{font-size:30px;}
     .hero .acts .btn,.hero .acts .link{width:auto;}
     .band b{font-size:30px;}
@@ -416,8 +422,8 @@
       <figure class="boards">
         <div class="board back">
           <div class="bh"><span>ALERT · 15:24:22</span><span class="lv">需现场处理</span></div>
-          <h3>09 号点位 · 层内湿度低于阈值</h3>
-          <div class="bl"><span>3 层 5 列</span><span>偏差 12.4%</span><span>派给 AGV-01</span></div>
+          <h3>09 号点位 · 湿度低于设定阈值</h3>
+          <div class="bl"><span>3 层 5 列</span><span>按设定阈值判定</span><span>派给 AGV-01</span></div>
         </div>
         <div class="turn"><s></s><span>3 min 19 s · 到点</span></div>
         <div class="board front">
